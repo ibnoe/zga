@@ -119,6 +119,12 @@ class CoreBuilder < ActiveRecord::Base
   end
   
   def delete_object
+    
+    if RollerBuilder.where(:core_builder_id => self.id).count != 0 
+      self.errors.add(:generic_errors, "Sudah ada roller builder yang menggunakan core builder ini")
+      return self 
+    end
+    
     if self.used_core.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada used core")
       return self 
@@ -129,6 +135,8 @@ class CoreBuilder < ActiveRecord::Base
       return self 
     end
     
+    used_core.destroy
+    new_core.destroy 
     self.destroy 
   end
   

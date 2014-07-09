@@ -5,6 +5,8 @@ class RollerBuilder < ActiveRecord::Base
   validate :uniq_roller_used_core_sku
   validate :uniq_roller_new_core_sku 
   validate :uniq_base_roller_sku 
+  validate :valid_core_builder_id 
+  validate :valid_compound_id
   
   def uniq_roller_used_core_sku
     return if not roller_used_core_sku.present?
@@ -58,6 +60,31 @@ class RollerBuilder < ActiveRecord::Base
     end
   end
   
+  validate :valid_core_builder_id 
+  validate :valid_compound_id
+  
+  def valid_core_builder_id
+    return if not core_builder_id.present?
+    
+    object = CoreBuilder.find_by_id core_builder_id
+    if object.nil?
+      self.errors.add(:generic_errors, "Tidak boleh kosong")
+      return self 
+    end
+  end
+  
+  def valid_compound_id
+    return if not compound_id.present?
+    
+    object = Item.find_by_id compound_id
+    if object.nil?
+      self.errors.add(:generic_errors, "Tidak boleh kosong")
+      return self 
+    end
+  end
+  
+  
+  
   def self.create_object(params)
     new_object = self.new 
     new_object.roller_used_core_sku = params[:roller_used_core_sku]         
@@ -65,6 +92,7 @@ class RollerBuilder < ActiveRecord::Base
     new_object.base_roller_sku = params[:base_roller_sku ]
     new_object.compound_id = params[:compound_id ]
     new_object.description   = params[:description ]
+    new_object.core_builder_id = params[:core_builder_id]
 
     if new_object.save 
       roller_new_core_object = Roller.create_object(
@@ -97,6 +125,7 @@ class RollerBuilder < ActiveRecord::Base
     self.new_core_sku  = params[:new_core_sku  ]
     self.base_core_sku = params[:base_core_sku ]
     self.description   = params[:description ]
+    self.core_builder_id = params[:core_builder_id]
     
     if self.save
       roller_new_core.update_object(
@@ -129,6 +158,9 @@ class RollerBuilder < ActiveRecord::Base
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada roller dari new core")
       return self 
     end
+    
+    roller_used_core.destroy
+    roller_new_core.destroy 
     
     self.destroy 
   end

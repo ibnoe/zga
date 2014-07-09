@@ -65,6 +65,11 @@ class Item < ActiveRecord::Base
   end
   
   def delete_object
+    if self.is_legacy?
+      self.errors.add(:generic_errors, "Legacy object")
+      return self 
+    end
+    
     puts "checking if stock_mutations is zero"
     if self.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi")
