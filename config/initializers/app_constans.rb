@@ -126,6 +126,12 @@ STOCK_MUTATION_ITEM_CASE = {
 }
 
 ITEM_TYPE_CONSTANT = {
-  :core => "1",
-  :roller => "2"
+  :core => 1 ,
+  :roller => 2 
+}
+
+
+CORE_STATUS = {
+  :new => 1 , 
+  :used => 2 
 }
