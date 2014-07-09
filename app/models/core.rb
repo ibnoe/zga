@@ -24,7 +24,7 @@ class Core < ActiveRecord::Base
   
   def update_object( params )
     self.core_sku = params[:core_sku]
-    self.sku = params[:sku]
+    self.sku = params[:core_sku]
     self.save 
   end
 end
