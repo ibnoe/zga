@@ -1,0 +1,74 @@
+body { background: url('images/background.png') repeat-x; padding-top: 0;}
+
+div.clear { clear:both; }
+
+/* HEADER */
+div.logo { text-align: left; height: 50px; font-weight:bold; letter-spacing:2px; font-size: 28px; margin-left:20px; display:block; font-family: Arial, Verdana, sans-serif; color:#0B7CB7;/*#FD4C0B;*/ }
+div.logo img { /* border:1px solid #585858;*/ margin-right: 10px; margin-top:20px;}
+
+#header { background:url('images/box_center.png') repeat-x; /*background-color: #333;*//*#585858;*/ margin-top:10px; height:40px; vertical-align: middle; -moz-border-radius: 15px; 	border-radius:15px; border-left:1px solid #CCC; border-right:1px solid #CCC;} 
+#headermenu { margin: 0; padding: 0; z-index: 30; position:relative; width:100%; vertical-align: middle; height:40px; font-family: "Trebuchet MS", "Lucida Grande", Arial, Helvetica, sans-serif;}
+#headermenu li { margin: 0; padding-top: 10px; list-style: none; float: left; font-size: 14px; height:30px; }
+#headermenu li a { display: block; margin-left:20px; padding-top: 3px; width: 80px; color: #333; text-align: center; text-decoration: none; vertical-align: middle; height:25px; font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;}
+#headermenu li a:hover{  }
+#headermenu div { position: absolute; visibility: hidden; margin-left: 20px; padding-bottom: 10px; padding-left: 10px; padding-right: 10px; background: #EFEFEF; /* border: 1px solid #585858; */ border-bottom-right-radius:10px; border-bottom-left-radius:10px; -moz-border-radius-bottomright:10px; -moz-border-radius-bottomleft:10px; border-bottom: 1px solid #ccc; border-left: 1px solid #ccc; border-right: 1px solid #ccc;} 
+#headermenu div a { position: relative; display: block; margin: 0; padding-top: 15px; /*white-space: nowrap; */ text-align: center; text-decoration: none; color: #333; font: 11px; width:80px; font-weight:normal;}
+#headermenu div a:hover { color: #FD4C0B; }
+
+
+
+/* SIDEBAR */
+#sidebar {position:relative; height:300px; width:150px; z-index:1; font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;  margin-left:20px; mergin-top:20px;}
+#sidenav {position:absolute; left:0; top:0; list-style-type:none; padding-left:10px;}
+#sidenav li {color:#424242; text-decoration:none; font-size:14px; cursor:pointer; padding:5px; margin-left:0; }
+
+.subsidenav {padding:0; margin:0;  display:none; padding-left:20px; list-style-type:none;}
+.subsidenav li a:visited, .subsidenav li a:link { text-decoration:none; color:#424242; }
+.subsidenav li a:hover { text-decoration:none; color:#FD4C0B;}
+
+/* MAIN CONTENT */
+
+#maincontent { background:#EFEFEF; width: 1050px; height: 600px; float: right; margin-right:15px; border-left: 1px dotted #ccc; border-right: 1px dotted #ccc;}
+
+/* FOOTER */
+
+#footer { width: 1050px; float:right; text-align: right;  padding: 10px 0; border-top: 1px dotted #ccc; color: #333; font-size: 11px; font-family: arial; font-weight:bold; margin-right:15px;} 
+
+/* SUPPLIER */
+#search { float: right; margin-right: 10px;}
+
+.main {margin-left: 30px; font-size: 11px; font-family: Verdana, "Trebuchet MS", "Helvetica Neue", Arial, Helvetica, sans-serif; margin-top:20px; margin-bottom: 20px; }
+
+.main  a:link, .main a:visited, .main a:active { 
+	font-size:11px; 
+	font-weight:bold; 
+	text-decoration:none;
+	padding:0;
+	color: #333;
+}
+
+.main a:hover { 
+	text-decoration:underline;
+}
+
+table.main th {
+	vertical-align:text-top;
+	font-size:12px;
+	padding:5px;
+	color:#fff;
+	background: #0B7CB7;
+}
+
+table.main  td{
+	padding: 10px;
+	border: 1px dotted #0B7CB7;
+	background: #fff;
+	margin:0;
+}
+
+/*general content css */
+.button { border: 1px solid #424242; background: #585858; color: #fff; padding:5px;}
+
+table { margin-left: 30px; font-size: 12px; font-family: Verdana, "Helvetica Neue", Arial, Helvetica, sans-serif; padding:5px; }
+
+h3 { margin-left: 30px; color: #08088A; font-family: Verdana, "Helvetica Neue", Arial, Helvetica, sans-serif; }

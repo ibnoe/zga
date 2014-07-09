@@ -1,0 +1,142 @@
+/* logo */
+.logo { padding:13px 20px 0 20px; }
+
+#header { background: url(../css/images/head-bg.jpg) repeat-x; width:100%; height:72px; }
+
+
+
+table.main  a:link, table.main a:visited, table.main a:active { 
+	font-size:11px; 
+	font-weight:bold; 
+	text-decoration:none;
+}
+
+table.main a:hover { 
+	text-decoration:underline;
+}
+
+
+a.updown img{ 
+	border:none;
+	vertical-align:text-bottom;
+	padding-bottom:0;
+	padding-top:auto;
+}
+
+table.main th {
+	vertical-align:text-top;
+	font-size:11px;
+}
+
+table.main {
+	margin-top:10px;
+	margin-bottom: 20px;
+	
+}
+
+fieldset.view input[type=text], fieldset.view select, #penawaranlistformholder fieldset input[type=text], #penawaranlistformholder fieldset select, fieldset.pelunasaninvoice select, fieldset.pelunasaninvoice input[type=text]{
+	width: 300px;
+}
+
+fieldset.unitdetails select, fieldset.unitdetails input[type=text]{
+	width: 80px;
+}
+
+#viewcontentform  table, #formholder  table, #penawaranalmostendformholder table, #penawaranview table, #penawaranlistformholder table, 
+#permintaanpenawaranformholder table, #penawaransparepartview table, #penawaransparepartlistformholder table, #servicelistformholder table,
+#workorderlistformholder table, #sparepartformholder table, fieldset.pelunasaninvoice table{
+	width: 100%;
+}
+
+fieldset.pelunasaninvoice span {
+	font-weight:bold;
+	padding: 5px;
+	margin-top: 5px;
+	font-size:14px;
+	text-decoration:underline;
+}
+
+fieldset.pelunasaninvoice table td.subsegment{
+	text-align: right;
+}
+
+#permintaanpenawaranformholder th {
+	text-align: left;
+	padding:25px;
+}
+
+table.unitdata input[type=text], #sparepartformholder input[type=text]{
+	width: 300px;
+}
+
+
+#closebutton {
+	margin-bottom:10px;
+}
+
+#formholder fieldset legend{
+	font-size: 14px;
+}
+
+#escalatortipeformholder, #escalatorklassformholder ,#elevatorcapsformholder, #elevatordoorformholder, #elevatorklassformholder, #elevatorpassformholder, #elevatorspeedformholder,
+#invoicecollectorformholder, #invoiceverifierformholder, #lokasiformholder, #polaserviceformholder {
+	font-size: 10px;
+	margin-top:5px;
+	background-color: #e8edff;
+}
+
+#escalatortipeformholder h1, #escalatorklassformholder h1, #elevatorcapsformholder h1, #elevatordoorformholder h1, #elevatorklassformholder h1, #elevatorpassformholder h1, #elevatorspeedformholder h1,
+#invoicecollectorformholder h1, #invoiceverifierformholder h1, #lokasiformholder h1, #polaserviceformholder h1, #sparepartformholder h1{
+	font-size: 14px;
+	margin-left: 5px;
+}
+
+#elevatorspeedoutput, #elevatorpassoutput, #elevatorklassoutput, #elevatordooroutput, #elevatorcapsoutput, #escalatortipeoutput, #escalatorklassoutput, 
+#invoicecollectoroutput, #invoiceverifieroutput, #lokasioutput, #polaserviceoutput, #sparepartoutput {
+	color: green;
+	margin-left: 5px;
+	font-weight: bold;
+	font-size: 11px;
+}
+
+#gsformholder{
+	font-size: 10px;
+	margin-top:5px;
+	background-color: #e8edff;
+}
+
+#gsformholder table {
+	font-size: 12px;
+	
+}
+
+#gsformholder h3 , #gsformholder h1, #polaserviceformholder h3, #formholder h3, #penawaranalmostendformholder h3, #servicelistformholder h3{
+	margin-left: 10px;
+	font-size: 14px;
+}
+
+#gsoutput, #gedungoutput {
+	color: green;
+	margin-left: 5px;
+	font-weight: bold;
+	font-size: 11px;
+}
+
+#penawaranview fieldset legend {
+	font-size: 14px;
+}
+
+#footer {
+	background:#a2a2a2;
+	width:100%;
+	height:50px;
+	padding-top:10px;
+}
+
+#footer p {
+	text-align:center;
+	font-weight:bold;
+	font-size: 16px;
+	margin:10px 0 0 0;
+
+}

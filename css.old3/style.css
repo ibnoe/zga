@@ -1,0 +1,100 @@
+body { background-color:#e6e6e6; padding-top: 0;}
+
+div.clear { clear:both; }
+
+/* HEADER */
+div.logo { text-align: left; height: 50px; font-weight:bold; letter-spacing:2px; font-size: 12px; margin-left:20px; display:block; font-family: Arial, Verdana, sans-serif; color:/*#0B7CB7*/#30273a;/*#FD4C0B;*/ }
+div.logo img { /* border:1px solid #585858;*/ margin-right: 10px; margin-top:20px; border:2px solid #30273a;}
+
+#header { background-color: #30273a	; margin-top:10px; height:30px;} 
+
+#headermenu { margin: 0; padding: 0; z-index: 30; position:relative; width:100%;  }
+
+#headermenu li { margin: 0; padding: 0; list-style: none; float: left; font: bold 11px arial; }
+
+#headermenu li a { display: block; margin: 0 1px 0 0; padding: 6px 10px; min-width: 80px; background: #30273a; color: #FFF; text-align: center; text-decoration: none; height:16px;  vertical-align:text-middle; border:1px solid #30273a;}
+
+#headermenu li a:hover{ background: #eae6ea; color: #734d99; border:1px solid #d1c5d8;}
+
+#headermenu div { position: absolute; visibility: hidden; margin: 0; padding: 0; background: #30273a; /* border: 1px solid #585858; */ height:30px;} 
+
+#headermenu div a { position: relative; display: block; margin: 0; padding: 5px 10px; width: auto; white-space: nowrap; text-align: left; text-decoration: none; 	background: #30273a; color: #fff; font: 11px arial; width:80px; border:1px solid #30273a;}
+
+#headermenu div a:hover {	background: #eae6ea; color: #734d99; border:1px solid #d1c5d8;}
+
+
+
+/* SIDEBAR */
+#sidebar {position:relative; height:300px; width:100px; z-index:1; background-color:#e6e6e6; font-family:arial, verdana, sans-serif;  margin-left:0;}
+#sidenav {position:absolute; left:0; top:0; list-style-type:none; padding-left:10px;}
+#sidenav li {color:#30273a; text-decoration:none; font-size:12px; cursor:pointer; font-weight:bold; padding: 10px; margin-left:0;}
+
+.subsidenav {padding:0; margin:0;  font-weight:bold; display:none; padding-left:20px; list-style-type:none;}
+.subsidenav li a:visited, .subsidenav li a:link { text-decoration:none; color:#8d78a5;}
+.subsidenav li a:hover { text-decoration:none; color:#30273a; text-decoration:underline;}
+
+/* MAIN CONTENT */
+
+#maincontent { background:#fff; width: 1050px; float: right; border-left: 1px dotted #ccc; padding-bottom:10px; padding-left:20px; padding-right:20px;}
+
+/* FOOTER */
+
+#footer { width: 1050px; float:right; text-align: right;  padding: 10px 0; border-top: 1px dotted #ccc; color: #333; font-size: 11px; font-family: arial; font-weight:bold; margin-right:15px;} 
+
+/* SUPPLIER */
+#search { float: right; padding-bottom:5px;}
+.ui-tabs .ui-tabs-panel
+			{
+				padding-left: 0;
+				padding-right: 0;
+				/*margin: 0 0 0 0;*/
+			}
+
+fieldset.view label { float: left; width: 10em; margin-right: 1em; }
+span.required { padding-left: 2px; color: red; text-decoration: none; }
+				
+table.main { 	border-collapse:collapse; width:100%; border-top:4px solid #BFBFBF;	 font-size: 12px; margin-top:20px; font-family: Arial,Verdana,sans-serif; border-bottom:1px solid #ccc; }
+table.main td, table.main th { border-bottom: 1px solid white; border-left:1px solid #ccc; border-right:1px solid #ccc;}
+table.main td { height:30px; vertical-align:bottom; padding:9px; background-color:#fff; color: #6d6d6d; font-size: 14px; border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px dotted #ccc;} 
+table.main a { color: #669; font-size:14px; text-decoration: none; font-weight:bold;}
+table.main th { text-align: left; height:30px; background-color:#DFDFDF; color:#30273A; padding:9px; font-size: 13px; }
+table.main tr:hover td{ background-color: #eae6ea; color:#6d6d6d; }
+table.main img { border:0; }			
+
+/* UI Tabs */
+ 
+.ui-widget-content a { 
+	font-size:11px; 
+}
+
+
+/*general content css */
+
+form { border: 0px solid #666699; padding: 8px; font-size: 12px;}
+form table
+			{
+				border-collapse:collapse;
+				font-size: 12px;
+				background-color:#f4f0ec;/*#e8edff;*/
+			}
+form table td { height:30px; vertical-align:bottom; padding: 9px 29px 9px 29px; color: #669; }
+			
+.viewtablebutton { font-family: Lucida Grande,Lucida Sans,Arial,sans-serif; font-size: 1em;}
+
+.viewtable { margin-left:30px; width:60%; border-collapse:collapse; background-color:#f4f0ec; font-family: Arial, Verdana, Sans-serif; font-size:14px; color:#333;}
+.viewtable td { padding-left:3px; border:1px dotted #ccc;  }
+
+h3.viewtitle { margin-left: 30px; color: #08088A; font-family: Verdana, "Helvetica Neue", Arial, Helvetica, sans-serif; }
+
+/*.listform { font-family: Arial, Verdana, Sans-serif; font-size: 14px; } */
+/*.listform input[type=submit] { margin-top: 20px;}*/
+
+.listform table.main { margin-top:15px; padding-left:0; }
+
+/* ADD TABLE */
+table.addtable { font-family: Arial, Verdana, Sans-serif; font-size: 14px;}
+table.addtable input[type=text] { width:200px; }
+
+/* EDIT TABLE */
+table.edittable { font-family: Arial, Verdana, Sans-serif; font-size: 14px;}
+table.edittable input[type=text] { width:200px; }
