@@ -1,4 +1,5 @@
 class Item < ActiveRecord::Base
+  acts_as_superclass
   has_many :warehouses, :through => :warehouse_items
   has_many :warehouse_items 
   belongs_to :item_type

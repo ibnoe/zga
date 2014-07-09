@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140704145023) do
+ActiveRecord::Schema.define(version: 20140709165058) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,6 +62,23 @@ ActiveRecord::Schema.define(version: 20140704145023) do
     t.datetime "updated_at"
   end
 
+  create_table "core_builders", force: true do |t|
+    t.string   "used_core_sku"
+    t.integer  "used_core_id"
+    t.string   "new_core_sku"
+    t.integer  "new_core_id"
+    t.string   "base_core_sku"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "cores", force: true do |t|
+    t.string   "core_sku"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "delivery_order_details", force: true do |t|
     t.integer  "delivery_order_id"
     t.integer  "sales_order_detail_id"
@@ -102,6 +119,8 @@ ActiveRecord::Schema.define(version: 20140704145023) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "item_type_id"
+    t.integer  "itemable_id"
+    t.string   "itemable_type"
   end
 
   create_table "machines", force: true do |t|
@@ -192,6 +211,23 @@ ActiveRecord::Schema.define(version: 20140704145023) do
     t.string   "title",       null: false
     t.text     "description", null: false
     t.json     "the_role",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roller_builders", force: true do |t|
+    t.string   "roller_used_core_sku"
+    t.string   "roller_new_core_sku"
+    t.string   "base_roller_sku"
+    t.integer  "core_builder_id"
+    t.integer  "compound_id"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "rollers", force: true do |t|
+    t.string   "roller_sku"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -45,4 +45,21 @@ class ItemType < ActiveRecord::Base
   def self.active_objects
     self.where(:is_deleted => false )
   end
+  
+  def self.setup_item_type
+    # core
+    new_object = self.new 
+    new_object.name = "CORE"
+    new_object.is_legacy = true 
+    new_object.legacy_code = ITEM_TYPE_CONSTANT[:core]
+    new_object.save 
+    
+    # roller 
+    new_object = self.new 
+    new_object.name = "ROLLER"
+    new_object.is_legacy = true 
+    new_object.legacy_code = ITEM_TYPE_CONSTANT[:roller]
+    new_object.save 
+    
+  end
 end

@@ -37,6 +37,9 @@ group :doc do
   gem 'sdoc', require: false
 end
 
+# https://github.com/hzamani/acts_as_relation
+gem 'acts_as_relation', '~> 1.0'
+
 
 gem 'devise'
 gem "kaminari"  

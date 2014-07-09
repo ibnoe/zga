@@ -53,15 +53,20 @@ data_entry_role = Role.create!(
   admin = User.create_main_user(  :name => "Admin4", :email => "admin4@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
   admin.set_as_main_user
 
-
+  item_type = ItemType.create_object(
+    :name => "Others",
+    :description => "on off item"
+  )
   
    item_array = [] 
   (1..3).each do |x|
     item = Item.create_object(
       :sku => "SKU #{x}",
-      :description => "Awesome description #{x}"
+      :description => "Awesome description #{x}",
+      :item_type_id => item_type.id 
     )
     
+    item.errors.messages.each {|x| puts "Item error message; #{x}"}
     item_array << item 
   end
   

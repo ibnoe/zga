@@ -124,3 +124,8 @@ STOCK_MUTATION_ITEM_CASE = {
   :ready => 2, 
   :pending_delivery => 3 
 }
+
+ITEM_TYPE_CONSTANT = {
+  :core => "1",
+  :roller => "2"
+}
