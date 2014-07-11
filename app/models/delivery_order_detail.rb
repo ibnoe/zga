@@ -249,6 +249,9 @@ class DeliveryOrderDetail < ActiveRecord::Base
       item.reverse_stock_mutation( sm )
       warehouse_item.reverse_stock_mutation( sm )
       sm.destroy
+      
+      item.reload
+      warehouse_item.reload
     end
     
     
@@ -257,6 +260,9 @@ class DeliveryOrderDetail < ActiveRecord::Base
     StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_delivery] ).each do |sm|
       item.reverse_stock_mutation( sm )
       sm.destroy
+      
+      item.reload
+      warehouse_item.reload
     end
     
     so_detail = self.sales_order_detail

@@ -199,6 +199,9 @@ class MaintenanceDetail < ActiveRecord::Base
         replacement_item.reverse_stock_mutation( sm )
         warehouse_item.reverse_stock_mutation( sm )
         sm.destroy
+        
+        item.reload
+        warehouse_item.reload
       end
       
     end

@@ -143,11 +143,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     # self.confirmed_at = nil 
     # self.save
     
-    StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
-      item.reverse_stock_mutation( sm )
-      warehouse_item.reverse_stock_mutation( sm )
-      sm.destroy
-    end
+
     
     
   end
@@ -197,6 +193,41 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     self.save
      
     roller_identification_detail.set_finish_status( true ) 
+    
+    
+  end
+  
+  def unfinish_object( params ) 
+    
+    
+    if not self.is_finished?
+      self.errors.add(:generic_errors, "Belum ada penyelesaian")
+      return self 
+    end
+    
+    if self.roller_identification_detail.is_delivered?
+      self.errors.add(:generic_errors, "Sudah ada pengiriman")
+    end
+    
+    # if it is delivered, can't be unfinished 
+    
+ 
+    StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
+      item.reverse_stock_mutation( sm )
+      warehouse_item.reverse_stock_mutation( sm )
+      sm.destroy
+      
+      item.reload
+      warehouse_item.reload 
+    end
+    
+    
+   
+    self.is_finished = false  
+    self.finished_at =  nil 
+    self.save
+     
+    roller_identification_detail.set_finish_status( false  ) 
     
     
   end
