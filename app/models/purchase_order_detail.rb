@@ -102,7 +102,7 @@ class PurchaseOrderDetail < ActiveRecord::Base
       return self 
     end
     
-    if not self.is_confirmed?
+    if  self.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
       return self 
     end
@@ -165,9 +165,12 @@ class PurchaseOrderDetail < ActiveRecord::Base
     self.confirmed_at = nil 
     self.save 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self , STOCK_MUTATION_ITEM_CASE[:pending_receival] ) 
-    item.reverse_stock_mutation( stock_mutation )
-    stock_mutation.destroy 
+    
+    StockMutation.get_by_source_document_detail( self , STOCK_MUTATION_ITEM_CASE[:pending_receival] ) .each do |sm|
+      item.reverse_stock_mutation( sm )
+      sm.destroy
+    end
+    
     
   end
   

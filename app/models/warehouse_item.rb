@@ -26,6 +26,15 @@ class WarehouseItem < ActiveRecord::Base
     end
   end
   
+  
+  def self.find_or_create_object( params ) 
+    object = self.where(:item_id => params[:item_id], :warehouse_id => params[:warehouse_id]).first 
+    
+    if object.nil?
+      return self.create_object( params ) 
+    end
+  end
+  
   def self.create_object( params ) 
     new_object           = self.new
     new_object.item_id    =  params[:item_id]
@@ -83,6 +92,9 @@ class WarehouseItem < ActiveRecord::Base
     self.ready += multiplier * stock_mutation.quantity 
     self.save 
   end
+  
+  
+
   
   
 end

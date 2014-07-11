@@ -5,10 +5,19 @@ describe SalesOrder do
     sku = "acedin3321"
     description = "awesome"
     standard_price = BigDecimal("80000")
+    
+    @item_type = ItemType.create_object(
+      :name => "Others",
+      :description => "on off item"
+    )
+    
+    
+    
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 
-    :standard_price => standard_price
+    :standard_price => standard_price,
+    :item_type_id => @item_type.id 
     )
     
     @contact = Contact.create_object(

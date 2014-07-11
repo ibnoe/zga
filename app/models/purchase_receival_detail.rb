@@ -257,19 +257,22 @@ class PurchaseReceivalDetail < ActiveRecord::Base
     self.confirmed_at = nil 
     self.save 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] )
     item = purchase_order_detail.item  
-    item.reverse_stock_mutation( stock_mutation )
-    warehouse_item.reverse_stock_mutation( stock_mutation )
-    stock_mutation.destroy 
+    
+    StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
+      item.reverse_stock_mutation( sm )
+      warehouse_item.reverse_stock_mutation( sm )
+      sm.destroy
+    end
+    
     
     item.reload 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_receival] ) 
-    item.reverse_stock_mutation( stock_mutation )
+    StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_receival] ).each do |sm|
+      item.reverse_stock_mutation( sm )
+      sm.destroy  
+    end 
     
-    
-    stock_mutation.destroy
     
     po_detail = self.purchase_order_detail
     po_detail.execute_receival( -1* self.quantity ) 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140709165058) do
+ActiveRecord::Schema.define(version: 20140709180226) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -105,6 +105,8 @@ ActiveRecord::Schema.define(version: 20140709165058) do
     t.string   "name"
     t.text     "description"
     t.boolean  "is_deleted",  default: false
+    t.integer  "is_legacy",   default: 0
+    t.integer  "legacy_code"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -222,6 +224,58 @@ ActiveRecord::Schema.define(version: 20140709165058) do
     t.integer  "core_builder_id"
     t.integer  "compound_id"
     t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roller_identification_details", force: true do |t|
+    t.string   "identification_code"
+    t.integer  "roller_identification_id"
+    t.integer  "core_builder_id"
+    t.boolean  "is_new_core",              default: false
+    t.text     "description"
+    t.boolean  "is_job_scheduled",         default: false
+    t.boolean  "is_finished",              default: false
+    t.boolean  "is_delivered",             default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roller_identifications", force: true do |t|
+    t.string   "code"
+    t.boolean  "is_self_production",  default: false
+    t.integer  "contact_id"
+    t.integer  "warehouse_id"
+    t.datetime "identification_date"
+    t.text     "description"
+    t.boolean  "is_confirmed",        default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",          default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roller_work_order_details", force: true do |t|
+    t.integer  "roller_work_order_id"
+    t.integer  "roller_identification_detail_id"
+    t.integer  "roller_builder_id"
+    t.string   "code"
+    t.datetime "finished_at"
+    t.boolean  "is_finished",                     default: false
+    t.boolean  "is_rejected",                     default: false
+    t.datetime "rejected_at"
+    t.text     "reject_description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roller_work_orders", force: true do |t|
+    t.string   "code"
+    t.integer  "roller_identification_id"
+    t.datetime "work_order_date"
+    t.text     "description"
+    t.boolean  "is_confirmed",             default: false
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -47,6 +47,7 @@ class Item < ActiveRecord::Base
   
   
   def self.create_object( params ) 
+    
     new_object = self.new
     new_object.sku = params[:sku]
     new_object.description = params[:description]

@@ -5,16 +5,26 @@ describe PurchaseOrderDetail do
     sku = "acedin3321"
     description = "awesome"
     standard_price = BigDecimal("80000")
+    
+    @item_type = ItemType.create_object(
+      :name => "Others",
+      :description => "on off item"
+    )
+    
+    
+    
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 
-    :standard_price => standard_price
+    :standard_price => standard_price,
+    :item_type_id => @item_type.id 
     )
     
     @item2 = Item.create_object(
     :sku            => sku + "32424",
     :description    => description, 
-    :standard_price => standard_price
+    :standard_price => standard_price,
+    :item_type_id => @item_type.id
     )
     
     @contact = Contact.create_object(
@@ -59,6 +69,10 @@ describe PurchaseOrderDetail do
       )
     end
     
+    it "should create valid po detail" do
+      @po_detail.should be_valid 
+    end
+    
     it "should be updatable" do
       @po_detail.update_object(
         :item_id => @item.id , 
@@ -67,7 +81,7 @@ describe PurchaseOrderDetail do
         :discount => BigDecimal("5")
       )
       
-      @po_detail.errors.messages.each {|x| puts "===========> #{x}"}
+      # @po_detail.errors.messages.each {|x| puts "===========> #{x}"}
       @po_detail.errors.size.should == 0
       @po_detail.should be_valid 
     end
@@ -86,7 +100,12 @@ describe PurchaseOrderDetail do
     end
     
     it "should be deletable" do
+      
+      puts "Total receival: #{@po_detail.purchase_receival_details.count}"
+      
       @po_detail.delete_object
+      
+      @po_detail.errors.messages.each {|x| puts "AmazingError: #{x}"}
       @po_detail.persisted?.should be_false
     end
     

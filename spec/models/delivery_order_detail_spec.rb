@@ -9,16 +9,26 @@ describe DeliveryOrderDetail do
       :name => "warehouse awesome",
       :description => "Badaboom"
     )
+    
+    @item_type = ItemType.create_object(
+      :name => "Others",
+      :description => "on off item"
+    )
+    
+    
+    
     @item = Item.create_object(
     :sku            => sku,
     :description    => description, 
-    :standard_price => standard_price
+    :standard_price => standard_price,
+    :item_type_id => @item_type.id 
     )
     
     @item2 = Item.create_object(
     :sku            => sku + "awesome",
     :description    => description, 
-    :standard_price => standard_price
+    :standard_price => standard_price,
+    :item_type_id => @item_type.id
     )
     
     @contact = Contact.create_object(

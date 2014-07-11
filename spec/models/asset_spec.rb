@@ -7,14 +7,24 @@ describe Asset do
       :brand => "Yokoko",
       :description => "awesome machine"
     )
+    
+    @item_type = ItemType.create_object(
+      :name => "Others",
+      :description => "on off item"
+    )
+    
+    
+    
     @item1 = Item.create_object(
       :sku => "34242wafaw",
-      :description => "awesome item"
+      :description => "awesome item",
+      :item_type_id => @item_type.id 
     )
     
     @item2 = Item.create_object(
       :sku => "aa34242wafaw",
-      :description => "awesome item2"
+      :description => "awesome item2",
+      :item_type_id => @item_type.id
     )
     
     @component = Component.create_object(

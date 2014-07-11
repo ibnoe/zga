@@ -7,14 +7,21 @@ describe StockAdjustmentDetail do
       :description => "Badaboom"
     )
     
+    @item_type = ItemType.create_object(
+      :name => "Others",
+      :description => "on off item"
+    )
+    
     @item1 = Item.create_object(
       :sku => "34242wafaw",
-      :description => "awesome item"
+      :description => "awesome item",
+      :item_type_id => @item_type.id 
     )
     
     @item2 = Item.create_object(
       :sku => "2234242wafaw",
-      :description => "awesome item 22"
+      :description => "awesome item 22",
+      :item_type_id => @item_type.id
     )
     
     @stock_adjustment = StockAdjustment.create_object(

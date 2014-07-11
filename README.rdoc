@@ -1,16 +1,71 @@
+Roller => solved, pretty much 
+Machine Type	Roller No.	Roller Type	RD	WL	TL	Compound
 
 
-we are in the context of multiwarehouse..
+RollerBuilder:
+1. CoreBuilder
+2. Compound
+3. Size: RD	WL	TL
+4. Roller Type
+5. Machine Type 
+6. Roller No 
 
-if it is about customer production, it is easy. RollerIdentification is used to increase quantity. 
 
-How about self production?
+Blanket => the fiber , comes in roll. They call it blanket stock roll.
+	ZGA identifies each roll. In each roll, the blanket's unit of measurement is SQM
+	
+	
+	BB = beginning balance
+	EB = ending balance 
+	
+	We do make blanket for stock. However, we do make it based on customer's order as well. 
+	
+	Information required in blanket job order:
+	1. JobOrderDate
+	2. Customer
+	3. Blanket Type (Eco , Vulcan, etc)
+	4. Press Machine (Ryobi 920)
+	5. Size : 939 x 681 x 1.96 (thickness)
+	5.5 Item Type: Bar or Non Bar? 
+	6. Bar Type : 50308
+	7. Quantity 
+	8. Expected delivery date 
+	
+	# on blanket job order confirm : will auto create blanket job order detail
+	
+	Question for now: is blanket an item? For stocking purposes,
+	
+	Hence, they have to select the size and blanket type (BIF), then select quantity. 
+	
+	If there is no size and blanket type, must create new BIF.
+	
+	BIF variant:
+	1. blanket type (Vulcan, Blanket Intaglio, Vulcan C3 007)
+	2. bar type
+	2.1 BlanketCase: With Bar or Without Bar
+	3. dimension 
+	4. press type
+	
+	If customer wants to do customer blanket => create new BIF
+	
+	BlanketJobOrder:
+	1. Select BIF
+	2. Customer
+	3. JobOrderDate
+	4. Quantity 
+	5. ExpectedDeliveryDate  
+	
+	On Confirm: auto create BlanketJobOrderDetail 
+	
 
-Mark as self production. Post confirm => don't increase ready quantity of that given sku
-
-And, if they want to do warehouse mutation or stock adjustment,
-
-the roller quantity can't be below the ready - identified and not finished item. 
-
-# in the core identification detail, it has status: is finished? 
-
+Things to do:
+1. Create unit of measurement (item has one unit of measurement)	
+2. Create Compound (compound extends item)
+3. Create Blanket (blanket extends item)
+4. Create Bar  (bar extends item)
+5. Create RollerBuilder
+		Roller recovery process:
+		1. Receive goods from customer
+		2. Create roller identification
+		3. Create work order
+6. Create Blanket 

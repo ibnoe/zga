@@ -151,9 +151,11 @@ class SalesOrderDetail < ActiveRecord::Base
     self.confirmed_at = nil 
     self.save 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self , STOCK_MUTATION_ITEM_CASE[:pending_delivery] ) 
-    item.reverse_stock_mutation( stock_mutation )
-    stock_mutation.destroy 
+    StockMutation.get_by_source_document_detail( self , STOCK_MUTATION_ITEM_CASE[:pending_delivery] ).each do |sm|
+      item.reverse_stock_mutation( sm )
+      sm.destroy
+    end 
+    
     
   end
   

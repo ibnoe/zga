@@ -194,10 +194,13 @@ class MaintenanceDetail < ActiveRecord::Base
   
   def unconfirm
     if is_replacement_required?
-      stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] )
-      replacement_item.reverse_stock_mutation( stock_mutation )
-      warehouse_item.reverse_stock_mutation( stock_mutation )
-      stock_mutation.destroy
+      
+      StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
+        replacement_item.reverse_stock_mutation( sm )
+        warehouse_item.reverse_stock_mutation( sm )
+        sm.destroy
+      end
+      
     end
   end
   

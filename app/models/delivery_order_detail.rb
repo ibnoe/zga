@@ -245,17 +245,19 @@ class DeliveryOrderDetail < ActiveRecord::Base
     
     item = sales_order_detail.item 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ) 
-    item.reverse_stock_mutation( stock_mutation )
-    warehouse_item.reverse_stock_mutation( stock_mutation )
-    stock_mutation.destroy 
+    StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ) .each do |sm|
+      item.reverse_stock_mutation( sm )
+      warehouse_item.reverse_stock_mutation( sm )
+      sm.destroy
+    end
+    
     
     item.reload 
     
-    stock_mutation = StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_delivery] ) 
-    item.reverse_stock_mutation( stock_mutation )
-    
-    stock_mutation.destroy
+    StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:pending_delivery] ).each do |sm|
+      item.reverse_stock_mutation( sm )
+      sm.destroy
+    end
     
     so_detail = self.sales_order_detail
     so_detail.execute_delivery( -1* self.quantity ) 
