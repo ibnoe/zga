@@ -8,17 +8,20 @@ class CoreBuilder < ActiveRecord::Base
   
   def uniq_used_core_sku
     return if not used_core_sku.present?
+   
     
-    total_duplicate_count = Core.where(:core_sku => self.used_core_sku).count
-    target = Core.where(:core_sku => self.used_core_sku).first
+    
+    total_duplicate_count = Item.where(:sku => self.used_core_sku).count
+    
+    target = Item.where(:sku => self.used_core_sku).first
     
     if not self.persisted? and total_duplicate_count != 0 
-      self.errors.add(:used_core_sku, "Sudah pernah ada")
+      self.errors.add(:used_core_sku, "Sudah pernah ada 1 ")
       return self 
     end
     
-    if self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
-      self.errors.add(:used_core_sku, "Sudah pernah ada")
+    if target and self.persisted? and target.id != self.used_core.item.id and total_duplicate_count  ==  1 
+      self.errors.add(:used_core_sku, "Sudah pernah ada 2")
       return self 
     end
   end
@@ -26,16 +29,18 @@ class CoreBuilder < ActiveRecord::Base
   def uniq_new_core_sku
     return if not new_core_sku.present?
     
-    total_duplicate_count = Core.where(:core_sku => self.new_core_sku).count
-    target = Core.where(:core_sku => self.new_core_sku).first
+    total_duplicate_count = Item.where(:sku => self.new_core_sku).count
+    target = Item.where(:sku => self.new_core_sku).first
     
     if not self.persisted? and total_duplicate_count != 0 
-      self.errors.add(:new_core_sku, "Harus uniq!")
+      self.errors.add(:new_core_sku, "Harus uniq! 1")
       return self 
     end
     
-    if self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
-      self.errors.add(:new_core_sku, "Harus uniq!")
+    
+    
+    if target and self.persisted? and target.id != self.new_core.item.id and total_duplicate_count  ==  1 
+      self.errors.add(:new_core_sku, "Harus uniq! 2")
       return self 
     end
   end
@@ -67,11 +72,11 @@ class CoreBuilder < ActiveRecord::Base
 
     if new_object.save 
       new_core_object = Core.create_object(
-        :core_sku => new_object.used_core_sku
+        :core_sku => new_object.new_core_sku 
       )
       
       used_core_object = Core.create_object(
-        :core_sku => new_object.new_core_sku
+        :core_sku => new_object.used_core_sku
       )
       new_object.new_core_id  = new_core_object.id
       new_object.used_core_id = used_core_object.id
@@ -125,12 +130,12 @@ class CoreBuilder < ActiveRecord::Base
       return self 
     end
     
-    if self.used_core.stock_mutations.count != 0 
+    if self.used_core.item.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada used core")
       return self 
     end
     
-    if self.new_core.stock_mutations.count != 0 
+    if self.new_core.item.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada new core")
       return self 
     end

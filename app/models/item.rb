@@ -38,7 +38,7 @@ class Item < ActiveRecord::Base
       return self 
     end
     
-    if self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
+    if target and self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
       self.errors.add(:sku, "Harus unik")
       return self 
     end

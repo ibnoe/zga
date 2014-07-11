@@ -17,9 +17,11 @@ class Core < ActiveRecord::Base
     new_object = Core.new
     new_object.core_sku = params[:core_sku]
     new_object.sku = params[:core_sku]
-    new_object.item_type_id = ItemType.find_by_legacy_code ITEM_TYPE_CONSTANT[:core]
-    new_object.is_legacy = true 
+    new_object.item_type_id = ItemType.find_by_legacy_code(ITEM_TYPE_CONSTANT[:core]).id 
     new_object.save 
+    
+    
+    return new_object
   end
   
   def update_object( params )

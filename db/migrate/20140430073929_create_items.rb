@@ -9,7 +9,7 @@ class CreateItems < ActiveRecord::Migration
       t.integer :pending_delivery , :default => 0
       
       t.boolean :is_deleted , :default => false 
-
+      
       t.timestamps
     end
   end

@@ -18,7 +18,7 @@ class Roller < ActiveRecord::Base
     new_object = self.new
     new_object.roller_sku = params[:roller_sku]
     new_object.sku = params[:roller_sku]
-    new_object.item_type_id = ItemType.find_by_legacy_code ITEM_TYPE_CONSTANT[:roller]
+    new_object.item_type_id = ItemType.find_by_legacy_code(ITEM_TYPE_CONSTANT[:roller]).id 
     new_object.is_legacy = true 
     new_object.save 
   end
