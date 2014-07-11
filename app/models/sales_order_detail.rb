@@ -152,7 +152,7 @@ class SalesOrderDetail < ActiveRecord::Base
     self.save 
     
     StockMutation.get_by_source_document_detail( self , STOCK_MUTATION_ITEM_CASE[:pending_delivery] ).each do |sm|
-      item.reverse_stock_mutation( sm )
+      sm.item.reverse_stock_mutation( sm )
       sm.destroy
       
       item.reload 

@@ -212,6 +212,11 @@ class RollerIdentification < ActiveRecord::Base
       return self 
     end
     
+    if self.roller_warehouse_mutations.where(:is_deleted => false ).count != 0
+      self.errors.add(:generic_errors, "Sudah ada roller yang berpindah")
+      return self 
+    end
+    
     
     if roller_identification_details.count != 0  and is_self_production == false 
       all_possible_id_array = roller_identification_details.map{|x| x.item.id  }

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140709180226) do
+ActiveRecord::Schema.define(version: 20140711115416) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -255,6 +255,25 @@ ActiveRecord::Schema.define(version: 20140709180226) do
     t.datetime "updated_at"
   end
 
+  create_table "roller_warehouse_mutation_details", force: true do |t|
+    t.integer  "roller_warehouse_mutation_id"
+    t.integer  "roller_identification_detail_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roller_warehouse_mutations", force: true do |t|
+    t.string   "code"
+    t.integer  "roller_identification_id"
+    t.date     "warehouse_mutation_date"
+    t.text     "description"
+    t.boolean  "is_confirmed",             default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_deleted",               default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "roller_work_order_details", force: true do |t|
     t.integer  "roller_work_order_id"
     t.integer  "roller_identification_detail_id"
@@ -276,6 +295,8 @@ ActiveRecord::Schema.define(version: 20140709180226) do
     t.text     "description"
     t.boolean  "is_confirmed",             default: false
     t.datetime "confirmed_at"
+    t.integer  "source_warehouse_id"
+    t.integer  "target_warehouse_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

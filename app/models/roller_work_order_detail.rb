@@ -213,8 +213,8 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     
  
     StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
-      item.reverse_stock_mutation( sm )
-      warehouse_item.reverse_stock_mutation( sm )
+      sm.item.reverse_stock_mutation( sm )
+      sm.warehouse_item.reverse_stock_mutation( sm )
       sm.destroy
       
       item.reload

@@ -13,6 +13,16 @@ Utility
   end
   
   
+  def warehouse_item
+    
+    return nil if warehouse_id.nil?
+    
+    WarehouseItem.where(
+      :warehouse_id => self.warehouse_id,
+      :item_id => self.item_id
+    ).first
+  end
+  
   def self.create_object( item, source_document_detail, stock_mutation_case, stock_mutation_item_case , warehouse_id )
     new_object = self.new 
     new_object.source_document_detail = source_document_detail.class.to_s

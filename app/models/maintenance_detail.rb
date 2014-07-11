@@ -196,8 +196,8 @@ class MaintenanceDetail < ActiveRecord::Base
     if is_replacement_required?
       
       StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
-        replacement_item.reverse_stock_mutation( sm )
-        warehouse_item.reverse_stock_mutation( sm )
+        sm.replacement_item.reverse_stock_mutation( sm )
+        sm.warehouse_item.reverse_stock_mutation( sm )
         sm.destroy
         
         item.reload

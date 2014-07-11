@@ -185,8 +185,8 @@ class RollerIdentificationDetail < ActiveRecord::Base
     
     
     StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
-      item.reverse_stock_mutation( sm )
-      warehouse_item.reverse_stock_mutation( sm )
+      sm.item.reverse_stock_mutation( sm )
+      sm.warehouse_item.reverse_stock_mutation( sm )
       sm.destroy
       
       item.reload
@@ -208,6 +208,12 @@ class RollerIdentificationDetail < ActiveRecord::Base
     self.is_finished = value
     self.save 
   end
+  
+  def set_delivery_status( value ) 
+    self.is_delivered = value
+    self.save 
+  end
+  
   
    
 end

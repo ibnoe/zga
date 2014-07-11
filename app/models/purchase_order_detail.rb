@@ -167,7 +167,7 @@ class PurchaseOrderDetail < ActiveRecord::Base
     
     
     StockMutation.get_by_source_document_detail( self , STOCK_MUTATION_ITEM_CASE[:pending_receival] ) .each do |sm|
-      item.reverse_stock_mutation( sm )
+      sm.item.reverse_stock_mutation( sm )
       sm.destroy
       
       item.reload
