@@ -10,7 +10,11 @@ class RollerWarehouseMutation < ActiveRecord::Base
   
   validates_presence_of :warehouse_mutation_date, :roller_identification_id 
   
-  validate :valid_roller_identification_id , :roller_identification_must_be_confirmed
+  validate :valid_roller_identification_id  
+  validate :roller_identification_must_be_confirmed
+  validate :valid_target_warehouse_id
+  validate :source_and_target_warehouse_must_be_different
+  
   
   def valid_roller_identification_id
     return if not  roller_identification_id.present? 
@@ -32,7 +36,44 @@ class RollerWarehouseMutation < ActiveRecord::Base
     end
   end
   
+  def valid_target_warehouse_id
+    
+    return if not  target_warehouse_id.present? 
+    
+    object = Warehouse.find_by_id target_warehouse_id 
+    
+    if object.nil?
+      self.errors.add(:target_warehouse_id, "Harus valid")
+      return self 
+    end
+    
+  end
+  
+  def source_and_target_warehouse_must_be_different
+    return if not target_warehouse_id.present?
+    return if not roller_identification_id.present? 
+    
+    if target_warehouse.id == source_warehouse.id
+      self.errors.add(:generic_errors, "Target warehouse dan source warehouse harus berbeda")
+      return self 
+    end
+  end
+  
    
+  
+  
+  def source_warehouse 
+    return nil if not roller_identification_id.present? 
+    
+    Warehouse.find_by_id roller_identification.warehouse_id 
+  end
+  
+  def target_warehouse 
+    return nil if not target_warehouse_id.present? 
+    
+    Warehouse.find_by_id target_warehouse_id 
+  end
+  
   
   
   def self.create_object( params ) 
@@ -40,11 +81,11 @@ class RollerWarehouseMutation < ActiveRecord::Base
     new_object.warehouse_mutation_date          = params[:warehouse_mutation_date]
     new_object.description              = params[:description]
     new_object.roller_identification_id = params[:roller_identification_id] 
-
+    new_object.target_warehouse_id = params[:target_warehouse_id]
 
     
     if new_object.save 
-      now = DateTime.now
+      now = new_object.created_at
       year = now.year
       month = now.month 
       
@@ -53,7 +94,7 @@ class RollerWarehouseMutation < ActiveRecord::Base
       end_of_the_month_datetime = (now + 1.months).beginning_of_month - 1.second
       
       total_item_created_in_current_month = self.where(
-        :warehouse_mutation_date => beginning_of_the_month_datetime..end_of_the_month_datetime
+        :created_at => beginning_of_the_month_datetime..end_of_the_month_datetime
       ).count 
       
       new_object.code = "#{year}/#{month}/#{total_item_created_in_current_month}"
@@ -81,9 +122,13 @@ class RollerWarehouseMutation < ActiveRecord::Base
     self.warehouse_mutation_date          = params[:warehouse_mutation_date]
     self.description              = params[:description]
     self.roller_identification_id = params[:roller_identification_id]
+    self.target_warehouse_id = params[:target_warehouse_id]
 
     
-    self.save 
+    if self.save 
+      self.warehouse_id = roller_identification.warehouse_id 
+      self.save 
+    end
     
     return self
   end
@@ -101,11 +146,11 @@ class RollerWarehouseMutation < ActiveRecord::Base
     if self.is_confirmed?
       self.errors.add(:generic_errors, "sudah di konfirmasi")
       return self
-    else
-      self.roller_warehouse_mutation_details.each {|x| x.delete_object }
-      self.is_deleted = true 
-      self.save 
     end
+    
+    self.roller_warehouse_mutation_details.each {|x| x.delete_object }
+    self.is_deleted = true 
+    self.save 
   end
   
   def all_roller_warehouse_mutation_details_confirmable?
@@ -149,19 +194,22 @@ class RollerWarehouseMutation < ActiveRecord::Base
     end
    
     
-    if self.all_roller_warehouse_mutation_details_confirmable?
-      if not params[:confirmed_at].present?
-        self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
-        return self
-      end
-      
-      self.is_confirmed = true 
-      self.confirmed_at = params[:confirmed_at]
-      self.save 
-      self.roller_warehouse_mutation_details.each {|x| x.confirm_object( params[:confirmed_at]) }
-    else
+    if not self.all_roller_warehouse_mutation_details_confirmable?
       self.errors.add(:generic_errors, "Ada roller warehouse_mutation detail yang tidak bisa di konfirmasi")
-      return self 
+      return self
+    end
+    
+  
+    if not params[:confirmed_at].present?
+      self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
+      return self
+    end
+    
+    self.is_confirmed = true 
+    self.confirmed_at = params[:confirmed_at]
+    self.save 
+    self.roller_warehouse_mutation_details.each {|x| x.confirm_object( params[:confirmed_at]) }
+      
     end
   end
   

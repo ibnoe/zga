@@ -1,5 +1,6 @@
 class RollerWarehouseMutationDetail < ActiveRecord::Base
   belongs_to :roller_warehouse_mutation
+  belongs_to :roller_identification_detail 
 
   
   validates_presence_of  :roller_warehouse_mutation_id , :roller_identification_detail_id 
