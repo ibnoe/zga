@@ -1,5 +1,6 @@
 class RollerIdentificationDetail < ActiveRecord::Base
   belongs_to :roller_identification
+  has_many :roller_work_order_details 
 
   
   validates_presence_of  :roller_identification_id , :core_builder_id, :identification_code 
@@ -8,6 +9,8 @@ class RollerIdentificationDetail < ActiveRecord::Base
   validate :valid_core_builder_id
   validate :can_not_create_if_parent_is_confirmed
   # validate :enough_available_unidentified_core_for_self_production
+  
+  
   
   
   def can_not_create_if_parent_is_confirmed
@@ -35,49 +38,14 @@ class RollerIdentificationDetail < ActiveRecord::Base
   def warehouse_item
     return if not roller_identification_id.present? 
     return if not item_id.present? 
-    
-    selected_warehouse_item = WarehouseItem.where(
+  
+    WarehouseItem.find_or_create_object(
       :item_id => item_id,
-      :warehouse_id => self.roller_identification.warehouse_id
-    ).first 
-    
-    if selected_warehouse_item.nil?
-      return WarehouseItem.create_object(
-        :item_id => item_id,
-        :warehouse_id =>  self.roller_identification.warehouse_id
-      )
-    else
-      return selected_warehouse_item
-    end
-    
+      :warehouse_id =>  self.roller_identification.warehouse_id
+    )
+     
   end
   
-  # def enough_available_unidentified_core_for_self_production
-  #   return if not  self.roller_identification.is_self_production?
-  #   return if not core_builder_id.present? 
-  #   
-  #   
-  #   selected_core = nil
-  #   
-  #   if is_new_core == true 
-  #     selected_core = core_builder.new_core
-  #   else
-  #     selected_core = core_builder.used_core 
-  #   end
-  #   
-  #   
-  #   total_core_count_in_warehouse = WarehouseItem.where(
-  #     :item_id => selected_core.item.id ,
-  #     :warehouse_id => roller_identification.warehouse_id 
-  #   ).first.ready 
-  #   
-  #   if self.persisted? 
-  #     if total_core_count_in_warehouse < total_identified_core
-  #   else
-  #     
-  #   end
-  # end
-  # 
    
    
   
@@ -170,18 +138,20 @@ class RollerIdentificationDetail < ActiveRecord::Base
      
   end
   
+  def assigned_work_order_detail
+    return nil if self.is_job_scheduled? 
+    
+    self.roller_work_order_details.where(:is_rejected => false).first 
+  end
+  
   def unconfirmable?
-    return false if  self.is_finished? or self.is_delivered?
+    return false if self.roller_work_order_details.count != 0 
 
     return true 
   end
   
   def unconfirm_object
     return self if not self.unconfirmable?
-    
-    # self.is_confirmed = false 
-    # self.confirmed_at = nil 
-    # self.save
     
     
     StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
@@ -192,6 +162,7 @@ class RollerIdentificationDetail < ActiveRecord::Base
       item.reload
       warehouse_item.reload
     end
+     
     
   end
   
@@ -213,6 +184,8 @@ class RollerIdentificationDetail < ActiveRecord::Base
     self.is_delivered = value
     self.save 
   end
+  
+
   
   
    

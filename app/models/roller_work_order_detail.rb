@@ -1,5 +1,6 @@
 class RollerWorkOrderDetail < ActiveRecord::Base
   belongs_to :roller_work_order
+  belongs_to :roller_identification_detail 
 
   
   validates_presence_of  :roller_work_order_id , :roller_builder_id 
@@ -7,6 +8,8 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   
   validate :valid_roller_builder_id
   validate :can_not_create_if_parent_is_confirmed
+  validate :roller_identification_detail_must_not_be_assigned_to_another_work_order
+  validate :roller_identification_detail_must_not_be_finished_or_delivered
   # validate :enough_available_unidentified_core_for_self_production
   
   
@@ -32,6 +35,30 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     end
   end
   
+  def roller_identification_detail_must_not_be_assigned_to_another_work_order
+    return if not roller_identification_detail_id.present?
+    
+    current_work_order_detail = roller_identification_detail.assigned_work_order_detail
+    
+    if roller_identification_detail.is_job_scheduled?  and current_work_order_detail.id != self.id 
+      self.errors.add(:roller_identification_detail_id, "Sudah diassign di work order lain")
+      return self 
+    end
+  end
+  
+  def roller_identification_detail_must_not_be_finished_or_delivered
+    return if not roller_identification_detail_id.present?
+     
+    if roller_identification_detail.is_finished  
+      self.errors.add(:roller_identification_detail_id, "Sudah selesai dikerjakan")
+      return self 
+    end
+    
+    if roller_identification_detail.is_delivered  
+      self.errors.add(:roller_identification_detail_id, "Sudah dikirim")
+      return self 
+    end
+  end
    
    
    
@@ -70,17 +97,19 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   
   def delete_object
     if not self.roller_work_order.is_confirmed?
-      self.destroy 
-    else
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
-      return self 
+      return self
     end
+    
+    
+    self.destroy 
   end
   
   
   
   def confirmable? 
-    return false if roller_identification_detail.is_job_scheduled?
+    roller_identification_detail_must_not_be_assigned_to_another_work_order
+    return false if self.errors.size != 0 
     return true
   end
   
@@ -100,10 +129,9 @@ class RollerWorkOrderDetail < ActiveRecord::Base
 
   
   def confirm_object(confirmation_datetime)
-    return self if not self.confirmable?
     
     
-    now = confirmation_datetime
+    now = roller_work_order.created_at 
     year = now.year
     month = now.month 
     
@@ -126,7 +154,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   end
   
   def unconfirmable?
-    return false if  self.is_finished? or self.is_delivered?
+    return false if  self.is_finished?  or self.is_rejected? 
 
     return true 
   end
@@ -139,11 +167,6 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     roller_identification_detail.set_job_scheduled(  false  ) 
     
     
-    # self.is_confirmed = false 
-    # self.confirmed_at = nil 
-    # self.save
-    
-
     
     
   end
@@ -210,6 +233,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     end
     
     # if it is delivered, can't be unfinished 
+     
     
  
     StockMutation.get_by_source_document_detail( self, STOCK_MUTATION_ITEM_CASE[:ready] ).each do |sm|
@@ -228,7 +252,6 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     self.save
      
     roller_identification_detail.set_finish_status( false  ) 
-    
     
   end
   

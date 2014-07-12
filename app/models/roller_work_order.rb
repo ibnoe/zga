@@ -11,6 +11,7 @@ class RollerWorkOrder < ActiveRecord::Base
   validates_presence_of :work_order_date, :roller_identification_id 
   
   validate :valid_roller_identification_id 
+  validate :roller_identification_must_be_confirmed 
   
   def valid_roller_identification_id
     return if not  roller_identification_id.present? 
@@ -24,6 +25,15 @@ class RollerWorkOrder < ActiveRecord::Base
     
   end
   
+  
+  def roller_identification_must_be_confirmed
+    return if not roller_identification_id.present? 
+    
+    if not roller_identification.is_confirmed?
+      self.errors.add(:generic_errors, "Roller Identification harus sudha di konfirmasi")
+      return self 
+    end
+  end
    
   
   
@@ -36,7 +46,7 @@ class RollerWorkOrder < ActiveRecord::Base
 
     
     if new_object.save 
-      now = DateTime.now
+      now = new_object.created_at
       year = now.year
       month = now.month 
       
@@ -45,7 +55,7 @@ class RollerWorkOrder < ActiveRecord::Base
       end_of_the_month_datetime = (now + 1.months).beginning_of_month - 1.second
       
       total_item_created_in_current_month = self.where(
-        :work_order_date => beginning_of_the_month_datetime..end_of_the_month_datetime
+        :created_at => beginning_of_the_month_datetime..end_of_the_month_datetime
       ).count 
       
       new_object.code = "#{year}/#{month}/#{total_item_created_in_current_month}"
@@ -64,7 +74,7 @@ class RollerWorkOrder < ActiveRecord::Base
     end
     
     if self.roller_work_order_details.count != 0 
-      self.errors.add(:generic_errors, "sudah ada identifikasi")
+      self.errors.add(:generic_errors, "sudah ada perintah pengerjaan roller")
       return self 
     end
     
@@ -88,14 +98,18 @@ class RollerWorkOrder < ActiveRecord::Base
   
   
   def delete_object
+    return if self.is_deleted? 
+    
+    
     if self.is_confirmed?
       self.errors.add(:generic_errors, "sudah di konfirmasi")
       return self
-    else
-      self.roller_work_order_details.each {|x| x.delete_object }
-      self.is_deleted = true 
-      self.save 
     end
+
+
+    self.roller_work_order_details.each {|x| x.delete_object }
+    self.is_deleted = true 
+    self.save 
   end
   
   def all_roller_work_order_details_confirmable?
@@ -110,6 +124,11 @@ class RollerWorkOrder < ActiveRecord::Base
   
   def confirm_object( params )
     return if self.is_deleted? 
+    
+    if self.is_confirmed? 
+      self.errors.add(:generic_errors, "Sudah konfirmasi")
+      return self 
+    end
   
     
     if self.roller_work_order_details.count == 0 
@@ -117,27 +136,21 @@ class RollerWorkOrder < ActiveRecord::Base
       return self
     end
     
-    if self.is_confirmed? 
-      self.errors.add(:generic_errors, "Sudah konfirmasi")
-      return self 
-    end
     
-     
-    
-    if self.all_roller_work_order_details_confirmable?
-      if not params[:confirmed_at].present?
-        self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
-        return self
-      end
-      
-      self.is_confirmed = true 
-      self.confirmed_at = params[:confirmed_at]
-      self.save 
-      self.roller_work_order_details.each {|x| x.confirm_object( params[:confirmed_at]) }
-    else
+    if not self.all_roller_work_order_details_confirmable?
       self.errors.add(:generic_errors, "Ada roller work_order detail yang tidak bisa di konfirmasi")
       return self 
     end
+    
+    if not params[:confirmed_at].present?
+      self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
+      return self
+    end
+    
+    self.is_confirmed = true 
+    self.confirmed_at = params[:confirmed_at]
+    self.save 
+    self.roller_work_order_details.each {|x| x.confirm_object( params[:confirmed_at]) }
   end
   
   def all_roller_work_order_details_unconfirmable?

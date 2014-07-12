@@ -7,7 +7,8 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
   
   validate :valid_roller_identification_detail_id
   validate :can_not_create_if_parent_is_confirmed
-  # validate :enough_available_unidentified_core_for_self_production
+  validate :roller_identification_detail_must_be_finished_and_not_delivered
+  validate :unique_detail
   
   
   def can_not_create_if_parent_is_confirmed

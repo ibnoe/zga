@@ -6,9 +6,11 @@
 
 class RollerIdentification < ActiveRecord::Base
   has_many :roller_identification_details 
-  belongs_to :warehouse 
-  
+  belongs_to :warehouse
   belongs_to :contact
+  
+  has_many :roller_work_orders
+  has_many :roller_warehouse_mutations 
   
   validates_presence_of :identification_date
   validates_presence_of :warehouse_id
@@ -63,7 +65,7 @@ class RollerIdentification < ActiveRecord::Base
 
     
     if new_object.save 
-      now = DateTime.now
+      now = new_object.created_at
       year = now.year
       month = now.month 
       
@@ -72,7 +74,7 @@ class RollerIdentification < ActiveRecord::Base
       end_of_the_month_datetime = (now + 1.months).beginning_of_month - 1.second
       
       total_item_created_in_current_month = self.where(
-        :identification_date => beginning_of_the_month_datetime..end_of_the_month_datetime
+        :created_at => beginning_of_the_month_datetime..end_of_the_month_datetime
       ).count 
       
       new_object.code = "#{year}/#{month}/#{total_item_created_in_current_year}"
@@ -117,14 +119,16 @@ class RollerIdentification < ActiveRecord::Base
   
   
   def delete_object
+    return if self.is_deleted? 
+    
     if self.is_confirmed?
       self.errors.add(:generic_errors, "sudah di konfirmasi")
       return self
-    else
-      self.roller_identification_details.each {|x| x.delete_object }
-      self.is_deleted = true 
-      self.save 
     end
+     
+    self.roller_identification_details.each {|x| x.delete_object }
+    self.is_deleted = true 
+    self.save
   end
   
   def all_roller_identification_details_confirmable?
@@ -179,20 +183,22 @@ class RollerIdentification < ActiveRecord::Base
     end
     
     
-    if self.all_roller_identification_details_confirmable?
-      if not params[:confirmed_at].present?
-        self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
-        return self
-      end
-      
-      self.is_confirmed = true 
-      self.confirmed_at = params[:confirmed_at]
-      self.save 
-      self.roller_identification_details.each {|x| x.confirm_object( params[:confirmed_at]) }
-    else
+    if not self.all_roller_identification_details_confirmable?
       self.errors.add(:generic_errors, "Ada roller identification detail yang tidak bisa di konfirmasi")
       return self 
     end
+    
+    
+    if not params[:confirmed_at].present?
+      self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
+      return self
+    end
+    
+    self.is_confirmed = true 
+    self.confirmed_at = params[:confirmed_at]
+    self.save 
+    self.roller_identification_details.each {|x| x.confirm_object( params[:confirmed_at]) } 
+      
   end
   
   def all_roller_identification_details_unconfirmable?
@@ -210,6 +216,11 @@ class RollerIdentification < ActiveRecord::Base
     if not self.is_confirmed? 
       self.errors.add(:generic_errors, "Belum konfirmasi")
       return self 
+    end
+    
+    if self.roller_work_orders.where(:is_deleted => false).count != 0 
+      self.errors.add(:generic_errors, "Sudah ada pengerjaan untuk identifikasi ini")
+      return self
     end
     
     if self.roller_warehouse_mutations.where(:is_deleted => false ).count != 0
@@ -236,7 +247,7 @@ class RollerIdentification < ActiveRecord::Base
         ) 
         
         if warehouse_item.ready - value < 0 
-          self.errors.add(:generic_errors, "Tidak cukup item #{warehouse_item.item.sku}")
+          self.errors.add(:generic_errors, "Tidak cukup item dengan sku: #{warehouse_item.item.sku}")
           return self 
         end
       end
