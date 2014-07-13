@@ -10,6 +10,7 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
   validate :can_not_create_if_parent_is_confirmed
   validate :roller_identification_detail_must_be_finished_and_not_delivered
   validate :unique_detail
+  validate :roller_warehouse_mutation_and_detail_must_have_equal_roller_identification
   
   
   def can_not_create_if_parent_is_confirmed
@@ -73,6 +74,16 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
     if not self.persisted? and roller_identification_detail_count != 0 
       self.errors.add(:roller_identification_detail_id, "Item harus uniq dalam 1 mutasi roller")
       return self
+    end
+  end
+  
+  def roller_warehouse_mutation_and_detail_must_have_equal_roller_identification
+    return if not roller_warehouse_mutation_id.present? 
+    return if not roller_identification_detail_id.present? 
+    
+    if  roller_identification_detail.roller_identification_id != roller_warehouse_mutation.roller_identification_id
+      self.errors.add(:roller_identification_detail_id, "Harus elemen dari roller identification yang dipilih di work order")
+      return self 
     end
   end
    

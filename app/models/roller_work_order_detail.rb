@@ -12,8 +12,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   validate :roller_identification_detail_must_not_be_finished_or_delivered
   validate :core_builder_must_be_compatible_with_roller_builder
   validate :uniq_roller_identification_detail 
-  # validate :enough_available_unidentified_core_for_self_production
-  
+  validate :roller_work_order_and_detail_must_have_equal_roller_identification
   
   def quantity 
     1 
@@ -108,6 +107,15 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   end
    
    
+  def roller_work_order_and_detail_must_have_equal_roller_identification
+    return if not roller_work_order_id.present? 
+    return if not roller_identification_detail_id.present? 
+    
+    if  roller_identification_detail.roller_identification_id != roller_work_order.roller_identification_id
+      self.errors.add(:roller_identification_detail_id, "Harus elemen dari roller identification yang dipilih di work order")
+      return self 
+    end
+  end
    
   
   def self.create_object( params ) 

@@ -8,7 +8,7 @@ class RollerWarehouseMutation < ActiveRecord::Base
   has_many :roller_warehouse_mutation_details 
   belongs_to :roller_identification  
   
-  validates_presence_of :warehouse_mutation_date, :roller_identification_id 
+  validates_presence_of :warehouse_mutation_date, :roller_identification_id , :target_warehouse_id 
   
   validate :valid_roller_identification_id  
   validate :roller_identification_must_be_confirmed
@@ -99,7 +99,7 @@ class RollerWarehouseMutation < ActiveRecord::Base
       
       new_object.code = "#{year}/#{month}/#{total_item_created_in_current_month}"
       
-      new_object.warehouse_id = roller_identification.warehouse_id 
+      new_object.source_warehouse_id = new_object.roller_identification.warehouse_id 
       new_object.save
        
       
@@ -126,7 +126,7 @@ class RollerWarehouseMutation < ActiveRecord::Base
 
     
     if self.save 
-      self.warehouse_id = roller_identification.warehouse_id 
+      self.source_warehouse_id = roller_identification.warehouse_id 
       self.save 
     end
     

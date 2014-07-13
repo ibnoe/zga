@@ -161,6 +161,12 @@ describe RollerWorkOrder do
   end
   
   
+  
+  it "should not allow rwo_detail to enter finish state if rwo is not confirmed" do
+    @rwo_detail.finish_object(:finished_at => DateTime.now )
+    @rwo_detail.errors.size.should_not ==0 
+  end
+  
   it "should allow confirmation for roller work order" do
     @rwo.confirm_object(:confirmed_at => DateTime.now + 7.days)
     @rwo.errors.size.should == 0 
