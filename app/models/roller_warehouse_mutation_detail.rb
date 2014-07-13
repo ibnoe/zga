@@ -4,7 +4,6 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
 
   
   validates_presence_of  :roller_warehouse_mutation_id , :roller_identification_detail_id 
-  validates_uniqueness_of :warehouse_mutation_code 
   
   validate :valid_roller_identification_detail_id
   validate :can_not_create_if_parent_is_confirmed
@@ -55,23 +54,23 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
     return if not roller_identification_detail_id.present? 
     return if not roller_warehouse_mutation_id.present? 
     
-    roller_identification_detail_count  = RollerIdentificationDetail.where(
+    object_count  = RollerWarehouseMutationDetail.where(
       :roller_warehouse_mutation_id => roller_warehouse_mutation_id,
       :roller_identification_detail_id => roller_identification_detail_id
     ).count 
     
-    roller_identification_detail = RollerIdentificationDetail.where(
+    object = RollerWarehouseMutationDetail.where(
       :roller_warehouse_mutation_id => roller_warehouse_mutation_id,
       :roller_identification_detail_id => roller_identification_detail_id
     ).first
     
-    if self.persisted? and roller_identification_detail.id != self.id   and roller_identification_detail_count == 1
+    if object and self.persisted? and object.id != self.id   and object_count == 1
       self.errors.add(:roller_identification_detail_id, "Item harus uniq dalam 1 mutasi roller")
       return self 
     end
     
     # there is item with such item_id in the database
-    if not self.persisted? and roller_identification_detail_count != 0 
+    if not self.persisted? and object_count != 0 
       self.errors.add(:roller_identification_detail_id, "Item harus uniq dalam 1 mutasi roller")
       return self
     end

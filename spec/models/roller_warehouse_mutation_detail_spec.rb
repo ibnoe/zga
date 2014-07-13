@@ -122,6 +122,13 @@ describe RollerWarehouseMutationDetail do
       :identification_code      =>  "2014/1/1/1/B", 
       :description              =>  " awesome yoshinoya"
     )
+    @ri_detail_3 = RollerIdentificationDetail.create_object(
+      :roller_identification_id => @ri.id , 
+      :core_builder_id          =>  @core_builder_2.id, 
+      :is_new_core              =>  false, 
+      :identification_code      =>  "2014/1/1/1/C", 
+      :description              =>  " awesome yoshinoya hahaha"
+    )
     
     @ri.reload
     @ri_detail.reload
@@ -169,76 +176,88 @@ describe RollerWarehouseMutationDetail do
 
     )
     
+    @rwo_detail_3 = RollerWorkOrderDetail.create_object(
+      :roller_work_order_id            => @rwo.id , 
+      :roller_builder_id               => @roller_builder_2.id  , 
+      :roller_identification_detail_id => @ri_detail_3.id 
+
+    )
+    
     @rwo.confirm_object(
       :confirmed_at => DateTime.now 
     )
     @rwo_detail.reload
     @rwo_detail_2.reload 
+    @rwo_detail_3.reload 
+    
+    @rwo_detail.finish_object(
+      :finished_at => DateTime.now + 4.months 
+    )
+    
+    @rwo_detail_3.finish_object(
+      :finished_at => DateTime.now + 4.months 
+    )
     
     @rwm = RollerWarehouseMutation.create_object(
       :warehouse_mutation_date  => DateTime.now + 2.months   ,
       :description              => "awesome mutation"         ,
       :roller_identification_id => @ri.id  ,
       :target_warehouse_id      => @warehouse_2.id 
-
     )
     
   end
   
+  it "should finish rwo_detail and rwo_detail_3" do
+    @rwo_detail_3.is_finished.should be_true 
+    @rwo_detail.is_finished.should be_true 
+  end
+   
   
-  it "should allow roller  work order detail creation" do
- 
-    @rwo_detail = RollerWorkOrderDetail.create_object(
-      :roller_work_order_id            => @rwo.id , 
-      :roller_builder_id               => @roller_builder_2.id  , 
-      :roller_identification_detail_id => @ri_detail_2.id 
-
+  it "should not allow detail creation if it is not finished" do
+    @rwm_detail = RollerWarehouseMutationDetail.create_object(
+      :roller_warehouse_mutation_id     => @rwm.id ,
+      :roller_identification_detail_id  => @rwo_detail_2.roller_identification_detail_id 
     )
     
-    @rwo_detail.should be_valid 
+    @rwm_detail.should_not be_valid
   end
   
-  it "should not allow roller work order detail if core_builder is not compatible with roller builder" do
-    @rwo_detail = RollerWorkOrderDetail.create_object(
-      :roller_work_order_id            => @rwo.id , 
-      :roller_builder_id               => @roller_builder_2.id  , 
-      :roller_identification_detail_id => @ri_detail.id 
-
+  it "should  allow detail creation if it is  finished" do
+    @rwm_detail = RollerWarehouseMutationDetail.create_object(
+      :roller_warehouse_mutation_id     => @rwm.id ,
+      :roller_identification_detail_id  => @rwo_detail.roller_identification_detail_id 
     )
     
-    @rwo_detail.errors.size.should_not == 0 
-    
-    @rwo_detail.should_not be_valid
+    @rwm_detail.should be_valid
   end
-  
- 
-  
-  context "created rwo_detail" do
+   
+  context "created rwm_detail" do
     before(:each) do 
-      @rwo_detail = RollerWorkOrderDetail.create_object(
-        :roller_work_order_id            => @rwo.id , 
-        :roller_builder_id               => @roller_builder_1.id  , 
-        :roller_identification_detail_id => @ri_detail.id 
-
+      @rwm_detail = RollerWarehouseMutationDetail.create_object(
+        :roller_warehouse_mutation_id     => @rwm.id ,
+        :roller_identification_detail_id  => @rwo_detail.roller_identification_detail_id 
       )
+      
+     
+      
     end
      
     it "should create valid roller work order" do
-      @rwo_detail.should be_valid 
+      @rwm_detail.should be_valid 
+      @rwm_detail.should be_valid 
     end
     
     
     it "should be updatable" do
-      @rwo_detail.update_object(
-        :roller_work_order_id            => @rwo.id , 
-        :roller_builder_id               => @roller_builder_2.id  , 
-        :roller_identification_detail_id => @ri_detail_2.id
+      @rwm_detail.update_object(
+        :roller_warehouse_mutation_id     => @rwm.id ,
+        :roller_identification_detail_id  => @rwo_detail_3.roller_identification_detail_id
       )
       
-      @rwo_detail.errors.messages.each {|x| puts "err: #{x}"}
+      @rwm_detail.errors.messages.each {|x| puts "err: #{x}"}
       
-      @rwo_detail.errors.size.should == 0
-      @rwo_detail.should be_valid 
+      @rwm_detail.errors.size.should == 0
+      @rwm_detail.should be_valid 
     end
     
     
@@ -247,53 +266,36 @@ describe RollerWarehouseMutationDetail do
    
     
     it "should be deletable" do
-      @rwo_detail.delete_object
-      @rwo_detail.persisted?.should be_false
+      @rwm_detail.delete_object
+      @rwm_detail.persisted?.should be_false
     end
     
-    it "should have unique roller detail in a given roller work order" do
-      @rwo_detail_2 = RollerWorkOrderDetail.create_object(
-        :roller_work_order_id            => @rwo.id , 
-        :roller_builder_id               => @roller_builder_1.id  , 
-        :roller_identification_detail_id => @ri_detail.id 
-      )
-      
-      @rwo_detail_2.errors.size.should_not == 0 
-    end
-
-
+    
     
     context "created 2 roller work order detail" do
       before(:each) do
-        @rwo_detail_2  = RollerWorkOrderDetail.create_object(
-          :roller_work_order_id            => @rwo.id , 
-          :roller_builder_id               => @roller_builder_2.id  , 
-          :roller_identification_detail_id => @ri_detail_2.id
+        @rwm_detail_3  = RollerWarehouseMutationDetail.create_object(
+          :roller_warehouse_mutation_id     => @rwm.id ,
+          :roller_identification_detail_id  => @rwo_detail_3.roller_identification_detail_id
         )
       end 
     
-      it "should create rwo_detail 2 " do
-        @rwo_detail_2.errors.size.should == 0 
-        @rwo_detail_2.should be_valid
+      it "should create rwm_detail 3 " do
+        @rwm_detail_3.errors.messages.each {|x| puts "rwm_detail: #{x}"}
+        @rwm_detail_3.errors.size.should == 0 
+        @rwm_detail_3.should be_valid
       end
     
     
      
     
       it "should be unique" do
-        @rwo_detail_2.update_object(
-          :roller_work_order_id            => @rwo.id , 
-          :roller_builder_id               => @roller_builder_1.id  , 
-          :roller_identification_detail_id => @ri_detail.id
+        @rwm_detail_3.update_object(
+          :roller_warehouse_mutation_id     => @rwm.id ,
+          :roller_identification_detail_id  => @rwo_detail.roller_identification_detail_id
         )
-        @rwo_detail_2.errors.size.should_not == 0 
+        @rwm_detail_3.errors.size.should_not == 0 
       end
-      
-      it "should not change the roller identification_detail" do
-        @ri_detail.reload
-        @ri_detail.is_job_scheduled.should be_false 
-      end
-      
     end
     
     
