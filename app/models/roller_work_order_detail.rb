@@ -15,6 +15,15 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   # validate :enough_available_unidentified_core_for_self_production
   
   
+  def quantity 
+    1 
+  end
+
+  # only useful for stock_mutation 
+  def confirmed_at 
+    finished_at 
+  end
+  
   def can_not_create_if_parent_is_confirmed
     return if not self.roller_work_order_id.present?
     return if self.persisted?
@@ -42,7 +51,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     
     current_work_order_detail = roller_identification_detail.assigned_work_order_detail
     
-    if roller_identification_detail.is_job_scheduled?  and current_work_order_detail.id != self.id 
+    if current_work_order_detail and roller_identification_detail.is_job_scheduled?  and current_work_order_detail.id != self.id 
       self.errors.add(:roller_identification_detail_id, "Sudah diassign di work order lain")
       return self 
     end
@@ -155,9 +164,9 @@ class RollerWorkOrderDetail < ActiveRecord::Base
    
   def target_item
     if roller_identification_detail.is_new_core? 
-      RollerBuilder.roller_new_core
+      self.roller_builder.roller_new_core_item
     else
-      RollerBuilder.roller_used_core
+      self.roller_builder.roller_used_core_item
     end
   end
   
@@ -213,6 +222,20 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     return self 
   end
   
+  def target_warehouse_item
+    WarehouseItem.find_or_create_object(
+      :warehouse_id => self.roller_identification_detail.roller_identification.warehouse_id,
+      :item_id => target_item.id 
+    )
+  end
+  
+  def source_warehouse_item
+    WarehouseItem.find_or_create_object(
+      :warehouse_id => self.roller_identification_detail.roller_identification.warehouse_id,
+      :item_id => roller_identification_detail.item.id 
+    )
+  end
+  
   
   def finish_object( params ) 
     if not self.roller_work_order.is_confirmed?
@@ -235,8 +258,9 @@ class RollerWorkOrderDetail < ActiveRecord::Base
       roller_work_order.roller_identification.warehouse_id 
     )
     
-    item.update_stock_mutation( stock_mutation ) 
-    warehouse_item.update_stock_mutation(stock_mutation) 
+    target_item.update_stock_mutation( stock_mutation ) 
+    
+    target_warehouse_item.update_stock_mutation(stock_mutation) 
     
     stock_mutation = StockMutation.create_object( 
       source_item, # the item 
@@ -246,8 +270,8 @@ class RollerWorkOrderDetail < ActiveRecord::Base
       roller_work_order.roller_identification.warehouse_id 
     )
     
-    item.update_stock_mutation( stock_mutation ) 
-    warehouse_item.update_stock_mutation(stock_mutation)
+    source_item.update_stock_mutation( stock_mutation ) 
+    source_warehouse_item.update_stock_mutation(stock_mutation)
     
     self.is_finished = true 
     self.finished_at = params[:finished_at]
@@ -258,7 +282,8 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     
   end
   
-  def unfinish_object( params ) 
+  
+  def unfinish_object 
     
     
     if not self.is_finished?
@@ -279,8 +304,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
       sm.warehouse_item.reverse_stock_mutation( sm )
       sm.destroy
       
-      item.reload
-      warehouse_item.reload 
+      
     end
     
     

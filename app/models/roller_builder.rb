@@ -155,6 +155,14 @@ class RollerBuilder < ActiveRecord::Base
     Roller.find_by_id self.roller_new_core_id
   end
   
+  def roller_used_core_item
+    roller_used_core.item 
+  end
+  
+  def roller_new_core_item
+    roller_new_core.item 
+  end
+  
   def delete_object
     if self.roller_used_core.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada roller dari used core")

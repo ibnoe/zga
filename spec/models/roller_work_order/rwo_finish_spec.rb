@@ -149,123 +149,106 @@ describe RollerWorkOrder do
       :description              =>    "awesome recovery proces", 
       :roller_identification_id =>   @ri.id 
     )
-  end
-  
-  it "should allow roller  work order detail creation" do
- 
-    @rwo_detail = RollerWorkOrderDetail.create_object(
-      :roller_work_order_id            => @rwo.id , 
-      :roller_builder_id               => @roller_builder_2.id  , 
-      :roller_identification_detail_id => @ri_detail_2.id 
-
-    )
     
-    @rwo_detail.should be_valid 
-  end
-  
-  it "should not allow roller work order detail if core_builder is not compatible with roller builder" do
     @rwo_detail = RollerWorkOrderDetail.create_object(
       :roller_work_order_id            => @rwo.id , 
-      :roller_builder_id               => @roller_builder_2.id  , 
+      :roller_builder_id               => @roller_builder_1.id  , 
       :roller_identification_detail_id => @ri_detail.id 
 
     )
     
-    @rwo_detail.errors.size.should_not == 0 
+    @target_item_1 = @rwo_detail.target_item
+    @source_item_1 = @rwo_detail.roller_identification_detail.item 
     
-    @rwo_detail.should_not be_valid
+    
+    @source_warehouse_item_1 = WarehouseItem.find_or_create_object(
+      :warehouse_id => @warehouse.id,
+      :item_id => @source_item_1.id 
+    )
+    
+    @target_warehouse_item_1 = WarehouseItem.find_or_create_object(
+      :warehouse_id => @warehouse.id,
+      :item_id => @target_item_1.id 
+    )
+    
+    @initial_ready_source_whi_1 = @source_warehouse_item_1.ready
+    @initial_ready_target_whi_1 = @target_warehouse_item_1.ready
+    
+    @rwo.confirm_object(:confirmed_at => DateTime.now + 7.days)
+    @rwo_detail.reload
+    @rwo.reload 
+    @ri_detail.reload
+    @ri_detail_2.reload 
+    @source_warehouse_item_1.reload
+    @target_warehouse_item_1.reload
+    
+
   end
   
- 
+  it "should have confirmed rwo" do
+    @rwo.is_confirmed.should be_true 
+  end
   
-  context "created rwo_detail" do
-    before(:each) do 
-      @rwo_detail = RollerWorkOrderDetail.create_object(
-        :roller_work_order_id            => @rwo.id , 
-        :roller_builder_id               => @roller_builder_1.id  , 
-        :roller_identification_detail_id => @ri_detail.id 
-
-      )
-    end
-     
-    it "should create valid roller work order" do
-      @rwo_detail.should be_valid 
-    end
+  it "should be allowed to finish rwo_detail" do
+    @rwo_detail.finish_object(
+      :finished_at => DateTime.now + 1.months 
+    )
     
-    
-    it "should be updatable" do
-      @rwo_detail.update_object(
-        :roller_work_order_id            => @rwo.id , 
-        :roller_builder_id               => @roller_builder_2.id  , 
-        :roller_identification_detail_id => @ri_detail_2.id
+    @rwo_detail.is_finished.should be_true 
+  end
+  
+  context "finishing rwo_detail" do
+    before(:each) do
+      
+      @initial_ready_source_whi_1 = @source_warehouse_item_1.ready
+      @initial_ready_target_whi_1 = @target_warehouse_item_1.ready
+      
+      @rwo_detail.finish_object(
+        :finished_at => DateTime.now + 1.months 
       )
       
-      @rwo_detail.errors.messages.each {|x| puts "err: #{x}"}
+      @source_warehouse_item_1.reload
+      @target_warehouse_item_1.reload
       
-      @rwo_detail.errors.size.should == 0
-      @rwo_detail.should be_valid 
     end
     
-    
-    
-    
-   
-    
-    it "should be deletable" do
-      @rwo_detail.delete_object
-      @rwo_detail.persisted?.should be_false
-    end
-    
-    it "should have unique roller detail in a given roller work order" do
-      @rwo_detail_2 = RollerWorkOrderDetail.create_object(
-        :roller_work_order_id            => @rwo.id , 
-        :roller_builder_id               => @roller_builder_1.id  , 
-        :roller_identification_detail_id => @ri_detail.id 
-      )
+    it "should create stock mutation: convert from the core to roller" do
+      @rwo_detail.is_finished.should be_true 
+      @final_ready_source_whi_1 = @source_warehouse_item_1.ready
+      diff_ready_source_whi_1 = @final_ready_source_whi_1 - @initial_ready_source_whi_1
+      diff_ready_source_whi_1.should == -1 
       
-      @rwo_detail_2.errors.size.should_not == 0 
+      @final_ready_target_whi_1 = @target_warehouse_item_1.ready
+      diff_ready_target_whi_1 = @final_ready_target_whi_1 - @initial_ready_target_whi_1
+      diff_ready_target_whi_1.should == 1 
     end
-
-
     
-    context "created 2 roller work order detail" do
+    
+    context "cancel finish rwo detail" do
       before(:each) do
-        @rwo_detail_2  = RollerWorkOrderDetail.create_object(
-          :roller_work_order_id            => @rwo.id , 
-          :roller_builder_id               => @roller_builder_2.id  , 
-          :roller_identification_detail_id => @ri_detail_2.id
-        )
-      end 
-    
-      it "should create rwo_detail 2 " do
-        @rwo_detail_2.errors.size.should == 0 
-        @rwo_detail_2.should be_valid
-      end
-    
-    
-     
-    
-      it "should be unique" do
-        @rwo_detail_2.update_object(
-          :roller_work_order_id            => @rwo.id , 
-          :roller_builder_id               => @roller_builder_1.id  , 
-          :roller_identification_detail_id => @ri_detail.id
-        )
-        @rwo_detail_2.errors.size.should_not == 0 
+        @initial_ready_source_whi_1 = @source_warehouse_item_1.ready
+        @initial_ready_target_whi_1 = @target_warehouse_item_1.ready
+        
+        @rwo_detail.unfinish_object
+         
+        @source_warehouse_item_1.reload
+        @target_warehouse_item_1.reload
       end
       
-      it "should not change the roller identification_detail" do
-        @ri_detail.reload
-        @ri_detail.is_job_scheduled.should be_false 
+      it "should cancel stock mutation" do
+        @rwo_detail.is_finished.should be_false 
+        @final_ready_source_whi_1 = @source_warehouse_item_1.ready
+        diff_ready_source_whi_1 = @final_ready_source_whi_1 - @initial_ready_source_whi_1
+        diff_ready_source_whi_1.should == 1 
+
+        @final_ready_target_whi_1 = @target_warehouse_item_1.ready
+        diff_ready_target_whi_1 = @final_ready_target_whi_1 - @initial_ready_target_whi_1
+        diff_ready_target_whi_1.should == -1 
       end
-      
     end
     
-    
-    
-  
-  
   end
+  
    
   
   
