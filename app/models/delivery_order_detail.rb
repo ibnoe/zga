@@ -58,7 +58,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
       :delivery_order_id => delivery_order_id
     ).first
     
-    if self.persisted? and delivery_detail.id != self.id   and delivery_detail_count == 1
+    if and delivery_detail self.persisted? and delivery_detail.id != self.id   and delivery_detail_count == 1
       self.errors.add(:sales_order_detail_id, "Item harus uniq dalam 1 pemesanan")
       return self 
     end

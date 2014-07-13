@@ -107,12 +107,12 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
   
   
   def delete_object
-    if not self.roller_warehouse_mutation.is_confirmed?
-      self.destroy 
-    else
+    if  self.roller_warehouse_mutation.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
-      return self 
+      return self
     end
+    
+    self.destroy 
   end
   
   

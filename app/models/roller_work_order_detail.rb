@@ -1,15 +1,17 @@
 class RollerWorkOrderDetail < ActiveRecord::Base
   belongs_to :roller_work_order
   belongs_to :roller_identification_detail 
+  belongs_to :roller_builder 
 
   
   validates_presence_of  :roller_work_order_id , :roller_builder_id 
-  validates_uniqueness_of :work_order_code 
-  
+   
   validate :valid_roller_builder_id
   validate :can_not_create_if_parent_is_confirmed
   validate :roller_identification_detail_must_not_be_assigned_to_another_work_order
   validate :roller_identification_detail_must_not_be_finished_or_delivered
+  validate :core_builder_must_be_compatible_with_roller_builder
+  validate :uniq_roller_identification_detail 
   # validate :enough_available_unidentified_core_for_self_production
   
   
@@ -59,6 +61,42 @@ class RollerWorkOrderDetail < ActiveRecord::Base
       return self 
     end
   end
+  
+  def core_builder_must_be_compatible_with_roller_builder
+    return if not roller_builder_id.present? 
+    return if not roller_identification_detail_id.present? 
+    
+    if roller_identification_detail.core_builder.id != roller_builder.core_builder_id
+      self.errors.add(:roller_builder_id, "Tidak compatible dengan core yang telah di identifikasi")
+      return self 
+    end
+  end
+  
+  def uniq_roller_identification_detail
+    return if not  roller_identification_detail_id.present? 
+    return if not  roller_work_order_id.present? 
+    
+    object_count  = RollerWorkOrderDetail.where(
+      :roller_identification_detail_id => roller_identification_detail_id,
+      :roller_work_order_id => roller_work_order_id
+    ).count 
+    
+    object = RollerWorkOrderDetail.where(
+      :roller_identification_detail_id => roller_identification_detail_id,
+      :roller_work_order_id => roller_work_order_id
+    ).first
+    
+    if object and self.persisted? and object.id != self.id   and object_count == 1
+      self.errors.add(:roller_identification_detail_id, "Sudah ada Roller #{roller_identification_detail.identification_code} di work order ini")
+      return self 
+    end
+    
+    # there is item with such item_id in the database
+    if not self.persisted? and object_count != 0 
+      self.errors.add(:roller_identification_detail_id, "Sudah ada Roller #{roller_identification_detail.identification_code} di work order ini")
+      return self
+    end
+  end
    
    
    
@@ -96,7 +134,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
   
   
   def delete_object
-    if not self.roller_work_order.is_confirmed?
+    if  self.roller_work_order.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
       return self
     end

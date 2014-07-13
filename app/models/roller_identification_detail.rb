@@ -96,12 +96,13 @@ class RollerIdentificationDetail < ActiveRecord::Base
   
   
   def delete_object
-    if not self.roller_identification.is_confirmed?
-      self.destroy 
-    else
+    if  self.roller_identification.is_confirmed? 
       self.errors.add(:generic_errors, "Sudah konfirmasi. Tidak bisa delete")
       return self 
     end
+    
+    self.destroy 
+    
   end
   
   

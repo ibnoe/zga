@@ -106,7 +106,7 @@ class StockAdjustmentDetail < ActiveRecord::Base
       :stock_adjustment_id => stock_adjustment_id
     ).first
     
-    if self.persisted? and object.id != self.id   and object_count == 1
+    if object and self.persisted? and object.id != self.id   and object_count == 1
       self.errors.add(:item_id, "Sudah ada Item seperti ini")
       return self 
     end

@@ -1,4 +1,5 @@
 class RollerBuilder < ActiveRecord::Base
+  has_many :roller_work_order_details
   
   validates_presence_of :roller_used_core_sku, :roller_new_core_sku , :base_roller_sku, :core_builder_id, :compound_id
   
@@ -111,6 +112,11 @@ class RollerBuilder < ActiveRecord::Base
   end
   
   def update_object( params ) 
+    if self.roller_work_order_details.count != 0 
+      self.errors.add(:generic_errors, "sudah ada recovery work order yang menggunakan roller builder ini")
+      return self 
+    end
+    
     if self.roller_used_core.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada used core")
       return self 

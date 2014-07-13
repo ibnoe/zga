@@ -34,7 +34,7 @@ class PurchaseOrderDetail < ActiveRecord::Base
       :purchase_order_id => purchase_order_id
     ).first
     
-    if self.persisted? and ordered_detail.id != self.id   and ordered_detail_count == 1
+    if ordered_detail and self.persisted? and ordered_detail.id != self.id   and ordered_detail_count == 1
       self.errors.add(:item_id, "Item harus uniq dalam 1 pemesanan")
       return self 
     end

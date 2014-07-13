@@ -63,7 +63,7 @@ class PurchaseReceivalDetail < ActiveRecord::Base
       :purchase_receival_id => purchase_receival_id
     ).first
     
-    if self.persisted? and receival_detail.id != self.id   and receival_detail_count == 1
+    if receival_detail and self.persisted? and receival_detail.id != self.id   and receival_detail_count == 1
       self.errors.add(:purchase_order_detail_id, "Item harus uniq dalam 1 pemesanan")
       return self 
     end
