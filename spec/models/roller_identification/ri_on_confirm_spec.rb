@@ -183,16 +183,89 @@ describe RollerIdentificationDetail do
     it "should confirm ri" do
       @ri.is_confirmed.should be_true
     end
-
+    
     it "should increase ready stock" do
       @final_ready_warehouse_item_1 = @warehouse_item_1.ready 
       diff = @initial_ready_warehouse_item_1 - @final_ready_warehouse_item_1
       diff.should == -1 
-
+    
       @final_ready_warehouse_item_2 = @warehouse_item_2.ready 
       diff = @initial_ready_warehouse_item_2 - @final_ready_warehouse_item_2
       diff.should == -1
     end
+    
+    it "should not be updatable" do
+      @ri_detail.update_object(
+        :roller_identification_id => @ri.id , 
+        :core_builder_id          =>  @core_builder_1.id, 
+        :is_new_core              =>  false, 
+        :identification_code      =>  "2014/1/1/1/C", 
+        :description              =>  " awesome hahahaa"
+      )
+      
+      @ri_detail.errors.size.should_not == 0 
+    end
+    
+    it "should not be allowed to create new ri_detail" do
+      @ri_detail_3 = RollerIdentificationDetail.create_object(
+        :roller_identification_id => @ri.id , 
+        :core_builder_id          =>  @core_builder_1.id, 
+        :is_new_core              =>  false, 
+        :identification_code      =>  "2014/1/1/1/C", 
+        :description              =>  " awesome yoshinoya"
+      )
+      
+      @ri_detail_3.errors.size.should_not == 0 
+    end
+    
+    it "should not be allowed to delete object" do
+      @ri_detail_2.delete_object
+      @ri_detail_2.persisted?.should be_true
+      @ri_detail_2.errors.size.should_not == 0 
+    end
+    
+    it "should be allowed to unconfirm" do
+      @ri.reload
+      @ri.unconfirm_object
+      @ri.is_confirmed.should be_false
+      @ri.errors.size.should == 0 
+    end
+    
+    context "unconfirm" do
+      before(:each) do
+        @warehouse_item_1.reload 
+        @warehouse_item_2.reload 
+        
+        @initial_ready_warehouse_item_1 = @warehouse_item_1.ready 
+        @initial_ready_warehouse_item_2 = @warehouse_item_2.ready
+        
+        
+        @ri.unconfirm_object
+        @ri.reload 
+        
+        @warehouse_item_1.reload 
+        @warehouse_item_2.reload
+        
+      end
+      
+      it "should return  reverse the quantity of ready item" do
+         
+        @final_ready_warehouse_item_1 = @warehouse_item_1.ready
+        diff = @initial_ready_warehouse_item_1 - @final_ready_warehouse_item_1
+        
+        diff.should == 1 
+         
+        @final_ready_warehouse_item_2 = @warehouse_item_2.ready
+        diff = @initial_ready_warehouse_item_2 - @final_ready_warehouse_item_2
+        
+        diff.should == 1 
+        
+        StockMutation.count.should == 0 
+      end
+    end
+  
+    
+    
   end
     
 end

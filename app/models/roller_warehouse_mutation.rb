@@ -210,7 +210,6 @@ class RollerWarehouseMutation < ActiveRecord::Base
     self.save 
     self.roller_warehouse_mutation_details.each {|x| x.confirm_object( params[:confirmed_at]) }
       
-    end
   end
   
   def all_roller_warehouse_mutation_details_unconfirmable?

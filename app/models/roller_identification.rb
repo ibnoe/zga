@@ -223,6 +223,8 @@ class RollerIdentification < ActiveRecord::Base
       return self
     end
     
+    puts "3321 awesome shite Total warehouse mutation: #{self.roller_warehouse_mutations.count}"
+    
     if self.roller_warehouse_mutations.where(:is_deleted => false ).count != 0
       self.errors.add(:generic_errors, "Sudah ada roller yang berpindah")
       return self 

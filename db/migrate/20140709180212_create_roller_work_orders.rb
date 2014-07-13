@@ -13,8 +13,9 @@ class CreateRollerWorkOrders < ActiveRecord::Migration
       
       
       # auto deduce based on the roller_identification_id 
-      t.integer :source_warehouse_id 
-      t.integer :target_warehouse_id 
+      
+      
+      t.boolean :is_deleted, :default => false 
       
       t.timestamps
     end

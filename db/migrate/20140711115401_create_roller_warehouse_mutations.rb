@@ -11,6 +11,9 @@ class CreateRollerWarehouseMutations < ActiveRecord::Migration
       t.boolean :is_confirmed, :default => false
       t.datetime :confirmed_at 
       
+      t.integer :source_warehouse_id 
+      t.integer :target_warehouse_id
+      
       t.boolean :is_deleted, :default => false
 
       t.timestamps
