@@ -15,15 +15,12 @@ describe RollerIdentificationDetail do
       :shipping_address => "Shipping Address"
     )
     
-    
     @item_sku = 'itemsku'
     
     @item_type = ItemType.create_object(
       :name => "Others",
       :description => "on off item"
     )
-    
-    
     
     @item = Item.create_object(
     :sku            => @item_sku,
@@ -104,124 +101,98 @@ describe RollerIdentificationDetail do
       :is_self_production  => false   ,
       :description         => "awesome"
     )
-  end
     
-  
-  it "should allow roller identification detail creation" do
-
-    @received_quantity = 1 
     @ri_detail = RollerIdentificationDetail.create_object(
       :roller_identification_id => @ri.id , 
-      :core_builder_id          =>  @core_builder_1.id ,
+      :core_builder_id          =>  @core_builder_1.id, 
       :is_new_core              =>  false, 
       :identification_code      =>  "2014/1/1/1/A", 
       :description              =>  " awesome yoshinoya"
     )
     
+    @ri_detail_2 = RollerIdentificationDetail.create_object(
+      :roller_identification_id => @ri.id , 
+      :core_builder_id          =>  @core_builder_2.id, 
+      :is_new_core              =>  false, 
+      :identification_code      =>  "2014/1/1/1/B", 
+      :description              =>  " awesome yoshinoya"
+    )
+    
+    @ri.reload
+    @ri_detail.reload
+    @ri_detail_2.reload 
+    
+    @item_1 = @ri_detail.item
+    @item_2 = @ri_detail_2.item 
+    
+    @warehouse_item_1 = WarehouseItem.find_or_create_object(
+      :item_id        => @item_1.id , 
+      :warehouse_id   => @warehouse.id 
+    )
+    
+    @warehouse_item_2 = WarehouseItem.find_or_create_object(
+      :item_id        => @item_2.id , 
+      :warehouse_id   => @warehouse.id 
+    )
+  end
+  
+  it "should create valid ri_detail1 and ri_detail2" do
     @ri_detail.should be_valid 
+    @ri_detail_2.should be_valid 
   end
   
- 
+  it "should create valid initial object" do
+    puts "item_1 : #{@item_1}"
+    puts "item_2 : #{@item_2}"
+    puts "warehouse_item_1: #{@warehouse_item_1}"
+    puts "warehouse_item_2: #{@warehouse_item_2}"
+    
+    @item_1.should be_valid
+    @item_2.should be_valid
+    
+    @warehouse_item_1.should be_valid 
+    @warehouse_item_2.should be_valid 
+  end
   
-  context "created ri_detail" do
+  it "should allowed to confirm" do
+    @ri.confirm_object( 
+      :confirmed_at => DateTime.now + 2.days 
+    )
+    
+    @ri.is_confirmed.should be_true
+  end
+  
+  context "confirm roller identification" do
     before(:each) do
-      @received_quantity = 1 
-    
       
-      @ri_detail = RollerIdentificationDetail.create_object(
-        :roller_identification_id => @ri.id , 
-        :core_builder_id          =>  @core_builder_1.id, 
-        :is_new_core              =>  false, 
-        :identification_code      =>  "2014/1/1/1/A", 
-        :description              =>  " awesome yoshinoya"
-      )
-    end
-    
-    it "should have unique identification_code" do
-      @ri_detail_2 = RollerIdentificationDetail.create_object(
-        :roller_identification_id => @ri.id , 
-        :core_builder_id          =>  @core_builder_1.id, 
-        :is_new_core              =>  false, 
-        :identification_code      =>  "2014/1/1/1/A", 
-        :description              =>  " awesome yoshinoya"
+      
+      @initial_ready_warehouse_item_1 = @warehouse_item_1.ready 
+      @initial_ready_warehouse_item_2 = @warehouse_item_2.ready 
+  
+      @ri.confirm_object( 
+        :confirmed_at => DateTime.now + 2.days 
       )
       
-      @ri_detail_2.errors.size.should_not == 0 
+       
+      @ri.reload 
+      @warehouse_item_1.reload
+      @warehouse_item_2.reload
+      
     end
-    
-    
-    
-    it "should be updatable" do
-      @ri_detail.update_object(
-        :roller_identification_id => @ri.id , 
-        :core_builder_id          =>  @core_builder_1.id, 
-        :is_new_core              =>  false, 
-        :identification_code      =>  "2014/1/1/1/C", 
-        :description              =>  " awesome yoshinoya"
-      )
-      
-      @ri_detail.errors.messages.each {|x| puts "err: #{x}"}
-      
-      @ri_detail.errors.size.should == 0
-      @ri_detail.should be_valid 
-    end
-    
-    
-    
-    
-   
-    
-    it "should be deletable" do
-      @ri_detail.delete_object
-      @ri_detail.persisted?.should be_false
-    end
-     
-    context "created 2 purchase receival detail" do
-      before(:each) do
-        @ri_detail_2 = RollerIdentificationDetail.create_object(
-          :roller_identification_id => @ri.id , 
-          :core_builder_id          =>  @core_builder_1.id, 
-          :is_new_core              =>  false, 
-          :identification_code      =>  "2014/1/1/1/B", 
-          :description              =>  " awesome yoshinoya"
-        )
-      end 
-      
-      it "should create pr_detail_2" do
-        @ri_detail_2.errors.size.should == 0 
-        @ri_detail_2.should be_valid
-      end
-      
-     
-      
-      it "should  allwo self update " do
-        @ri_detail_2.update_object(
-          :roller_identification_id => @ri.id , 
-          :core_builder_id          =>  @core_builder_1.id, 
-          :is_new_core              =>  false, 
-          :identification_code      =>  "2014/1/1/1/B", 
-          :description              =>  " awesome yoshinoya"
-        )
-        
-        @ri_detail_2.errors.messages.each {|x| puts "Error: #{x}"}
-        @ri_detail_2.errors.size.should == 0 
-      
-      end
-      
-      it "should have unique identification_code upon update" do
-         
 
-        @ri_detail_2.update_object(
-          :roller_identification_id => @ri.id , 
-          :core_builder_id          =>  @core_builder_1.id, 
-          :is_new_core              =>  false, 
-          :identification_code      =>  "2014/1/1/1/A", 
-          :description              =>  " awesome yoshinoya"
-        )
+    it "should confirm ri" do
+      @ri.is_confirmed.should be_true
+    end
 
-        @ri_detail.errors.size.should == 0 
-      end
+    it "should increase ready stock" do
+      @final_ready_warehouse_item_1 = @warehouse_item_1.ready 
+      diff = @initial_ready_warehouse_item_1 - @final_ready_warehouse_item_1
+      diff.should == -1 
+
+      @final_ready_warehouse_item_2 = @warehouse_item_2.ready 
+      diff = @initial_ready_warehouse_item_2 - @final_ready_warehouse_item_2
+      diff.should == -1
     end
   end
-  
+    
 end

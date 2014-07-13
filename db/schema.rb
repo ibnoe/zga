@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140711115416) do
+ActiveRecord::Schema.define(version: 20140713031042) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,12 @@ ActiveRecord::Schema.define(version: 20140711115416) do
     t.integer  "machine_id"
     t.string   "name"
     t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "compounds", force: true do |t|
+    t.string   "compound_sku"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -219,7 +225,9 @@ ActiveRecord::Schema.define(version: 20140711115416) do
 
   create_table "roller_builders", force: true do |t|
     t.string   "roller_used_core_sku"
+    t.integer  "roller_used_core_id"
     t.string   "roller_new_core_sku"
+    t.integer  "roller_new_core_id"
     t.string   "base_roller_sku"
     t.integer  "core_builder_id"
     t.integer  "compound_id"

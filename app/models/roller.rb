@@ -19,12 +19,13 @@ class Roller < ActiveRecord::Base
     new_object.roller_sku = params[:roller_sku]
     new_object.sku = params[:roller_sku]
     new_object.item_type_id = ItemType.find_by_legacy_code(ITEM_TYPE_CONSTANT[:roller]).id 
-    new_object.is_legacy = true 
     new_object.save 
+    
+    return new_object
   end
   
   def update_object( params )
-    self.core_sku = params[:roller_sku]
+    self.roller_sku = params[:roller_sku]
     self.sku = params[:roller_sku]
     self.save 
   end

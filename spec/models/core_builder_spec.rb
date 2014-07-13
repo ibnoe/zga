@@ -90,6 +90,30 @@ describe CoreBuilder do
       new_core.should be_valid 
     end
     
+    it "should not allow update to sku that has been existing" do
+      @core_builder.update_object(
+        :used_core_sku => @item_sku  ,          
+        :new_core_sku  =>  @core_builder.new_core_sku,
+        :base_core_sku => @core_builder.base_core_sku,
+        :description   =>  "Awesome core"
+      )
+      
+      @core_builder.errors.size.should_not == 0
+      
+    end
+    
+    it "should allow update" do
+      @core_builder.update_object(
+        :used_core_sku => @core_builder.used_core_sku  ,          
+        :new_core_sku  =>  @core_builder.new_core_sku,
+        :base_core_sku => @core_builder.base_core_sku,
+        :description   =>  "Awesome core update"
+      )
+      
+      @core_builder.errors.size.should == 0
+      
+    end
+    
     context "on core builder update, the core will update its sku as well" do
       before(:each) do
         

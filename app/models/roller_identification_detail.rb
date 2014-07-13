@@ -1,6 +1,8 @@
 class RollerIdentificationDetail < ActiveRecord::Base
   belongs_to :roller_identification
   has_many :roller_work_order_details 
+  
+  belongs_to :core_builder
 
   
   validates_presence_of  :roller_identification_id , :core_builder_id, :identification_code 
@@ -11,7 +13,13 @@ class RollerIdentificationDetail < ActiveRecord::Base
   # validate :enough_available_unidentified_core_for_self_production
   
   
+  def quantity
+    1
+  end
   
+  def confirmed_at
+    self.roller_identification.confirmed_at
+  end
   
   def can_not_create_if_parent_is_confirmed
     return if not self.roller_identification_id.present?
@@ -37,10 +45,11 @@ class RollerIdentificationDetail < ActiveRecord::Base
   
   def warehouse_item
     return if not roller_identification_id.present? 
-    return if not item_id.present? 
   
+  
+    
     WarehouseItem.find_or_create_object(
-      :item_id => item_id,
+      :item_id => self.item.id ,
       :warehouse_id =>  self.roller_identification.warehouse_id
     )
      
@@ -104,9 +113,9 @@ class RollerIdentificationDetail < ActiveRecord::Base
    
   def item
     if self.is_new_core?
-      core_builder.new_core
+      core_builder.new_core_item
     else
-      core_builder.used_core
+      core_builder.used_core_item 
     end
   end
   
@@ -128,6 +137,7 @@ class RollerIdentificationDetail < ActiveRecord::Base
        )
 
       item.update_stock_mutation( stock_mutation ) 
+       
       warehouse_item.update_stock_mutation(stock_mutation) 
  
       self.save

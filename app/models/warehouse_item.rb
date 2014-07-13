@@ -32,6 +32,8 @@ class WarehouseItem < ActiveRecord::Base
     
     if object.nil?
       return self.create_object( params ) 
+    else
+      return object 
     end
   end
   

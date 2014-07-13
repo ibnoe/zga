@@ -61,5 +61,11 @@ class ItemType < ActiveRecord::Base
     new_object.legacy_code = ITEM_TYPE_CONSTANT[:roller]
     new_object.save 
     
+    new_object = self.new 
+    new_object.name = "Compound"
+    new_object.is_legacy = true 
+    new_object.legacy_code = ITEM_TYPE_CONSTANT[:compound]
+    new_object.save
+    
   end
 end

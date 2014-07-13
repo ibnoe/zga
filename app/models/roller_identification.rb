@@ -42,7 +42,7 @@ class RollerIdentification < ActiveRecord::Base
   end
   
   def valid_contact_and_target_production_status
-    if is_self_production.true? and contact_id.present? 
+    if is_self_production? and contact_id.present? 
       contact = Contact.find_by_id contact_id 
       
       if contact.nil?
@@ -77,7 +77,7 @@ class RollerIdentification < ActiveRecord::Base
         :created_at => beginning_of_the_month_datetime..end_of_the_month_datetime
       ).count 
       
-      new_object.code = "#{year}/#{month}/#{total_item_created_in_current_year}"
+      new_object.code = "#{year}/#{month}/#{total_item_created_in_current_month}"
       new_object.save
        
       

@@ -123,6 +123,14 @@ class CoreBuilder < ActiveRecord::Base
     Core.find_by_id self.new_core_id
   end
   
+  def used_core_item
+    used_core.item 
+  end
+  
+  def new_core_item
+    new_core.item 
+  end
+  
   def delete_object
     
     if RollerBuilder.where(:core_builder_id => self.id).count != 0 

@@ -7,37 +7,38 @@ class RollerBuilder < ActiveRecord::Base
   validate :uniq_base_roller_sku 
   validate :valid_core_builder_id 
   validate :valid_compound_id
+   
   
   def uniq_roller_used_core_sku
     return if not roller_used_core_sku.present?
     
-    total_duplicate_count = Roller.where(:roller_sku => self.roller_used_core_sku).count
-    target = Roller.where(:roller_sku => self.roller_used_core_sku).first
+    total_duplicate_count = Item.where(:sku => self.roller_used_core_sku).count
+    target = Item.where(:sku => self.roller_used_core_sku).first
     
     if not self.persisted? and total_duplicate_count != 0 
-      self.errors.add(:roller_used_core_sku, "Sudah pernah ada")
+      self.errors.add(:roller_used_core_sku, "Sudah pernah ada 1")
       return self 
     end
     
-    if self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
-      self.errors.add(:roller_used_core_sku, "Sudah pernah ada")
+    if target and self.persisted? and target.id != self.roller_used_core.item.id and total_duplicate_count  ==  1 
+      self.errors.add(:roller_used_core_sku, "Sudah pernah ada 2")
       return self 
     end
   end
   
   def uniq_roller_new_core_sku
-    return if not new_core_sku.present?
-    
-    total_duplicate_count = Roller.where(:roller_sku => self.roller_new_core_sku).count
-    target = Roller.where(:roller_sku => self.roller_new_core_sku).first
+    return if not roller_new_core_sku.present?
+
+    total_duplicate_count = Item.where(:sku => self.roller_new_core_sku).count
+    target = Item.where(:sku => self.roller_new_core_sku).first
     
     if not self.persisted? and total_duplicate_count != 0 
-      self.errors.add(:roller_new_core_sku, "Harus uniq!")
+      self.errors.add(:roller_new_core_sku, "Harus uniq! 1 ")
       return self 
     end
     
-    if self.persisted? and target.id != self.id and total_duplicate_count  ==  1 
-      self.errors.add(:roller_new_core_sku, "Harus uniq!")
+    if target and self.persisted? and target.id != self.roller_new_core.item.id and total_duplicate_count  ==  1 
+      self.errors.add(:roller_new_core_sku, "Harus uniq! 2")
       return self 
     end
   end
@@ -47,7 +48,7 @@ class RollerBuilder < ActiveRecord::Base
     return if not base_roller_sku.present?
     
     total_duplicate_count = RollerBuilder.where(:base_roller_sku => self.base_roller_sku).count
-    target = RollerBuilder.where(:base_core_sku => self.base_roller_sku).first
+    target = RollerBuilder.where(:base_roller_sku => self.base_roller_sku).first
     
     if not self.persisted? and total_duplicate_count != 0 
       self.errors.add(:base_roller_sku, "Harus uniq!")
@@ -60,8 +61,7 @@ class RollerBuilder < ActiveRecord::Base
     end
   end
   
-  validate :valid_core_builder_id 
-  validate :valid_compound_id
+  
   
   def valid_core_builder_id
     return if not core_builder_id.present?
@@ -76,7 +76,7 @@ class RollerBuilder < ActiveRecord::Base
   def valid_compound_id
     return if not compound_id.present?
     
-    object = Item.find_by_id compound_id
+    object = Compound.find_by_id compound_id
     if object.nil?
       self.errors.add(:generic_errors, "Tidak boleh kosong")
       return self 
@@ -111,19 +111,20 @@ class RollerBuilder < ActiveRecord::Base
   end
   
   def update_object( params ) 
-    if self.used_core.stock_mutations.count != 0 
+    if self.roller_used_core.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada used core")
       return self 
     end
     
-    if self.new_core.stock_mutations.count != 0 
+    if self.roller_new_core.stock_mutations.count != 0 
       self.errors.add(:generic_errors, "Sudah ada stock mutasi pada new core")
       return self 
     end
     
-    self.used_core_sku = params[:used_core_sku]         
-    self.new_core_sku  = params[:new_core_sku  ]
-    self.base_core_sku = params[:base_core_sku ]
+    self.roller_used_core_sku = params[:roller_used_core_sku]         
+    self.roller_new_core_sku  = params[:roller_new_core_sku  ]
+    self.base_roller_sku = params[:base_roller_sku ]
+    self.compound_id = params[:compound_id ]
     self.description   = params[:description ]
     self.core_builder_id = params[:core_builder_id]
     
