@@ -150,7 +150,7 @@ class RollerIdentificationDetail < ActiveRecord::Base
   end
   
   def assigned_work_order_detail
-    return nil if self.is_job_scheduled? 
+    return nil if not self.is_job_scheduled? 
     
     self.roller_work_order_details.where(:is_rejected => false).first 
   end

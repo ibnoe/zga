@@ -12,6 +12,14 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
   validate :roller_warehouse_mutation_and_detail_must_have_equal_roller_identification
   
   
+  def quantity
+    1
+  end
+  
+  def confirmed_at
+    self.roller_warehouse_mutation.confirmed_at
+  end
+  
   def can_not_create_if_parent_is_confirmed
     return if not self.roller_warehouse_mutation_id.present?
     return if self.persisted?
@@ -134,7 +142,7 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
   
     
   def item
-    roller_identification_detail.item 
+    roller_identification_detail.assigned_work_order_detail.target_item 
   end
   
   def source_warehouse_item
@@ -183,7 +191,7 @@ class RollerWarehouseMutationDetail < ActiveRecord::Base
     )
     
     item.update_stock_mutation( stock_mutation ) 
-    source_warehouse_item.update_stock_mutation(stock_mutation)
+    target_warehouse_item.update_stock_mutation(stock_mutation)
     
     
     

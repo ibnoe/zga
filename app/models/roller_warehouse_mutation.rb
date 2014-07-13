@@ -183,11 +183,13 @@ class RollerWarehouseMutation < ActiveRecord::Base
     delivered_roller_identification_count = RollerIdentificationDetail.where{
       ( id.in roller_identification_detail_id_array ) & 
       (
-        ( is_finished.eq false ) | 
-        ( is_delivered.eq true )
+        ( is_delivered.eq true ) | 
+        ( is_finished.eq false )
       )
-    }
+    }.count
     
+    
+    puts ">>>>3321 total count : #{delivered_roller_identification_count}"
     if delivered_roller_identification_count != 0 
       self.errors.add(:generic_errors, "Ada roller identification yang sudah terkirim di pengiriman ini")
       return self 
