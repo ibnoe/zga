@@ -108,6 +108,9 @@ class RollerIdentificationDetail < ActiveRecord::Base
   
   
   def confirmable? 
+    
+      
+    
     return true
   end
   

@@ -256,6 +256,13 @@ class RollerWorkOrderDetail < ActiveRecord::Base
       return self 
     end
     
+    if self.is_rejected?
+      self.errors.add(:generic_errors, "Sudah reject")
+      return self 
+    end
+    
+    
+    
  
     
     stock_mutation = StockMutation.create_object( 
@@ -325,5 +332,69 @@ class RollerWorkOrderDetail < ActiveRecord::Base
     
   end
   
+  
+  def reject_object( params )
+    if self.is_rejected? 
+      self.errors.add(:generic_errors, "Sudah reject")
+      return self 
+    end
+    
+    if self.is_finished?
+      self.errors.add(:generic_errors, "Sudah finish")
+      return self 
+    end
+    
+    if not self.roller_work_order.is_confirmed?
+      self.errors.add(:generic_errors, "belum konfirmasi")
+      return self 
+    end
+    
+    if not params[:rejected_at].present?
+      self.errors.add(:rejected_at, "Harus ada tanggal reject")
+      return self
+    end
+    
+    
+    self.is_rejected = true 
+    self.rejected_at = params[:rejected_at]
+    self.save 
+    self.roller_identification_detail.set_job_scheduled( false ) 
+    
+  end
+  
+  def unreject_object
+    if not self.is_rejected? 
+      self.errors.add(:generic_errors, "Belum reject")
+      return self 
+    end
+    
+    if self.is_finished?
+      self.errors.add(:generic_errors, "Sudah finish")
+      return self 
+    end
+    
+    if not  self.roller_work_order.is_confirmed?
+      self.errors.add(:generic_errors, "belum konfirmasi")
+      return self 
+    end
+    
+    if self.roller_identification_detail.is_job_scheduled?
+      self.errors.add(:generic_errors, "Sudah ada work order lain untuk roller ini")
+      return self 
+    end
+    
+    if not params[:rejected_at].present?
+      self.errors.add(:rejected_at, "Harus ada tanggal reject")
+      return self
+    end
+    
+    
+    
+    
+    self.is_rejected = false 
+    self.rejected_at =  nil 
+    self.save 
+    self.roller_identification_detail.set_job_scheduled( true  )
+  end
    
 end

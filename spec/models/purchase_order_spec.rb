@@ -35,7 +35,7 @@ describe PurchaseOrder do
   
 
 
-  it "should create valid stock adjustment" do
+  it "should create valid po" do
     @po = PurchaseOrder.create_object(
       :purchase_date  => DateTime.new(2012,2,2,0,0,0),
       :description    => "Awesome purchase order",

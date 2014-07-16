@@ -128,7 +128,9 @@ STOCK_MUTATION_ITEM_CASE = {
 ITEM_TYPE_CONSTANT = {
   :core => 1 ,
   :roller => 2 ,
-  :compound => 3 
+  :compound => 3 ,
+  :bar => 4 ,
+  :barring => 5 
 }
 
 

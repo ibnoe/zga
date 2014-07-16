@@ -12,7 +12,6 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   # validate :can_not_select_unconfirmed_purchase_order_detail
    
   
-  after_save :create_warehouse_item_if_not_existed_yet
   
   def can_not_create_if_parent_is_confirmed
     return if not self.purchase_receival_id.present?
@@ -88,36 +87,14 @@ class PurchaseReceivalDetail < ActiveRecord::Base
   end
   
   def warehouse_item
-    selected_warehouse_item = WarehouseItem.where(
+    
+    WarehouseItem.find_or_create_object(
       :item_id => self.purchase_order_detail.item_id,
       :warehouse_id => self.purchase_receival.warehouse_id
-    ).first 
-    
-    if selected_warehouse_item.nil?
-      return WarehouseItem.create_object(
-        :item_id => self.purchase_order_detail.item_id,
-        :warehouse_id =>  self.purchase_receival.warehouse_id
-      )
-    else
-      return selected_warehouse_item
-    end
-    
-  end
+    )
   
-  def create_warehouse_item_if_not_existed_yet
-    selected_warehouse_item = WarehouseItem.where(
-      :item_id => self.purchase_order_detail.item_id,
-      :warehouse_id => self.purchase_receival.warehouse_id
-    ).first 
-    
-    if selected_warehouse_item.nil?
-      WarehouseItem.create_object(
-        :item_id => self.purchase_order_detail.item_id,
-        :warehouse_id =>  self.purchase_receival.warehouse_id
-      )
-    end
   end
-  
+   
   def self.create_object( params ) 
     new_object = self.new
     new_object.purchase_receival_id = params[:purchase_receival_id ]

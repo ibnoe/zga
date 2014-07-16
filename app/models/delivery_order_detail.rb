@@ -58,7 +58,7 @@ class DeliveryOrderDetail < ActiveRecord::Base
       :delivery_order_id => delivery_order_id
     ).first
     
-    if and delivery_detail self.persisted? and delivery_detail.id != self.id   and delivery_detail_count == 1
+    if  delivery_detail  and self.persisted? and delivery_detail.id != self.id   and delivery_detail_count == 1
       self.errors.add(:sales_order_detail_id, "Item harus uniq dalam 1 pemesanan")
       return self 
     end
@@ -200,6 +200,11 @@ class DeliveryOrderDetail < ActiveRecord::Base
       STOCK_MUTATION_ITEM_CASE[:ready]   # stock_mutation_item_case
      ) 
     item.update_stock_mutation( stock_mutation )
+    
+    WarehouseItem.find_or_create_object(
+      :item_id => item.id,
+      :warehouse_id => delivery_order.warehouse_id
+    ).update_stock_mutation(stock_mutation)
     
     stock_mutation = StockMutation.create_object( 
       item, # the item 

@@ -137,6 +137,9 @@ class RollerWorkOrder < ActiveRecord::Base
     end
     
     
+    
+    
+    
     if not self.all_roller_work_order_details_confirmable?
       self.errors.add(:generic_errors, "Ada roller work_order detail yang tidak bisa di konfirmasi")
       return self 
