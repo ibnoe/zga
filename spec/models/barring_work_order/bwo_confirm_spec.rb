@@ -207,10 +207,10 @@ describe RollerWorkOrder do
       end
       
       
-      it "should not allow to finish bwo_detail" do
+      it "should  allow to finish bwo_detail" do
         @bwo_detail_1.reload
         @bwo_detail_1.finish_object(:finished_at => "DateTime.now", :blanket_usage => 10 )
-        @bwo_detail_1.errors.size.should_not  == 0 
+        @bwo_detail_1.errors.size.should  == 0 
       end
       
 
