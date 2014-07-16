@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140713031042) do
+ActiveRecord::Schema.define(version: 20140716132802) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,6 +32,56 @@ ActiveRecord::Schema.define(version: 20140713031042) do
     t.string   "code"
     t.text     "description"
     t.boolean  "is_deleted",  default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "barring_work_order_details", force: true do |t|
+    t.integer  "barring_work_order_id"
+    t.integer  "barring_id"
+    t.string   "code"
+    t.boolean  "is_finished",           default: false
+    t.datetime "finished_at"
+    t.string   "finish_description"
+    t.boolean  "is_rejected",           default: false
+    t.datetime "rejected_at"
+    t.string   "reject_description"
+    t.integer  "blanket_usage",         default: 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "barring_work_orders", force: true do |t|
+    t.string   "code"
+    t.integer  "warehouse_id"
+    t.string   "description"
+    t.datetime "work_order_date"
+    t.boolean  "is_deleted"
+    t.boolean  "is_confirmed"
+    t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "barrings", force: true do |t|
+    t.string   "barring_sku"
+    t.boolean  "is_bar_included", default: false
+    t.integer  "left_bar_id"
+    t.integer  "right_bar_id"
+    t.integer  "blanket_id"
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bars", force: true do |t|
+    t.string   "bar_sku"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "blankets", force: true do |t|
+    t.string   "blanket_sku"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

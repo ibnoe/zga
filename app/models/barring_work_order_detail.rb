@@ -1,6 +1,6 @@
 class BarringWorkOrderDetail < ActiveRecord::Base
   belongs_to :barring_work_order
-  belongs_to :item 
+  belongs_to :barring 
   
   validates_presence_of :barring_work_order_id, :barring_id , :code
   validates_uniqueness_of :code 
@@ -32,6 +32,14 @@ class BarringWorkOrderDetail < ActiveRecord::Base
     
   end
 
+
+  def confirmed_at
+    if self.is_rejected?
+      return self.rejected_at
+    elsif self.is_finished?
+      return self.finished_at
+    end
+  end
    
   
   def self.create_object( params ) 
@@ -80,8 +88,13 @@ class BarringWorkOrderDetail < ActiveRecord::Base
   def blanket_warehouse_item
     WarehouseItem.find_or_create_object(
       :warehouse_id => self.barring_work_order.warehouse_id,
-      :item_id => self.barring.blanket_id
+      :item_id => self.barring.blanket.item.id 
     )
+  end
+  
+  
+  def blanket
+    self.barring.blanket 
   end
   
   def left_bar
@@ -99,14 +112,14 @@ class BarringWorkOrderDetail < ActiveRecord::Base
   def left_bar_warehouse_item
     WarehouseItem.find_or_create_object(
       :warehouse_id => self.barring_work_order.warehouse_id,
-      :item_id => left_bar.item 
+      :item_id => left_bar.item .id 
     )
   end
   
   def right_bar_warehouse_item 
     WarehouseItem.find_or_create_object(
       :warehouse_id => self.barring_work_order.warehouse_id,
-      :item_id => right_bar.item 
+      :item_id => right_bar.item.id  
     )
   end
   
@@ -122,7 +135,9 @@ class BarringWorkOrderDetail < ActiveRecord::Base
   def non_negative_final_quantity_in_warehouse
     # will deduct the blanket
     
-    if blanket_warehouse_item.ready  - self.barring.blanket_usage < 0 
+    puts "blanet ready: #{blanket_warehouse_item.ready }"
+    puts "usage: #{self.blanket_usage}"
+    if blanket_warehouse_item.ready  - self.blanket_usage < 0 
       self.errors.add(:generic_errors, "Total blanket akan menjadi negative")
       return self 
     end
@@ -165,8 +180,7 @@ class BarringWorkOrderDetail < ActiveRecord::Base
   def confirm_object(confirmation_datetime)
     return self if not self.confirmable?
      
-    self.is_confirmed = true
-    self.save
+ 
     
      
   end
@@ -204,14 +218,27 @@ class BarringWorkOrderDetail < ActiveRecord::Base
       return self 
     end
     
+    if not params[:blanket_usage].present? 
+      self.errors.add(:blanket_usage, "Harus ada pemakaian blanket")
+      return self 
+    end
+    
+    if params[:blanket_usage].present? and params[:blanket_usage].to_i <= 0 
+      self.errors.add(:blanket_usage, "Pemakaian blanket harus lebih besar dari 0")
+      return self 
+    end
+    
+    self.blanket_usage = params[:blanket_usage]
+    
     non_negative_final_quantity_in_warehouse
     return self if self.errors.size != 0 
     
  
     # stock mutation for blanket
     
-    stock_mutation = StockMutation.create_object( 
-      blanket_warehouse_item , # the item 
+    stock_mutation = StockMutation.create_bulk_usage_object( 
+      blanket.item , # the item 
+      self.blanket_usage, 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:deduction], # stock_mutation_case,
       STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
@@ -227,8 +254,9 @@ class BarringWorkOrderDetail < ActiveRecord::Base
     
     if barring.is_bar_included?
       
-      stock_mutation = StockMutation.create_object( 
-        left_bar_warehouse_item , # the item 
+      stock_mutation = StockMutation.create_bulk_usage_object( 
+        left_bar.item , # the item 
+        1,
         self, # source_document_detail 
         STOCK_MUTATION_CASE[:deduction], # stock_mutation_case,
         STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
@@ -239,8 +267,9 @@ class BarringWorkOrderDetail < ActiveRecord::Base
       stock_mutation.warehouse_item.update_stock_mutation(stock_mutation)
       
       
-      stock_mutation = StockMutation.create_object( 
-        right_bar_warehouse_item , # the item 
+      stock_mutation = StockMutation.create_bulk_usage_object( 
+        right_bar.item , # the item 
+        1,
         self, # source_document_detail 
         STOCK_MUTATION_CASE[:deduction], # stock_mutation_case,
         STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
@@ -252,8 +281,9 @@ class BarringWorkOrderDetail < ActiveRecord::Base
       
     end
     
-    stock_mutation = StockMutation.create_object( 
-      barring_warehouse_item  , # the item 
+    stock_mutation = StockMutation.create_bulk_usage_object( 
+      barring.item  , # the item 
+      1,
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:addition], # stock_mutation_case,
       STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
@@ -327,13 +357,27 @@ class BarringWorkOrderDetail < ActiveRecord::Base
       self.errors.add(:rejected_at, "Harus ada tanggal reject")
       return self
     end
+
+    if not params[:blanket_usage].present?
+      self.errors.add(:blanket_usage, "Harus ada pemakaian blanket")
+      return self 
+    end
+
+    if params[:blanket_usage].present? and params[:blanket_usage].to_i <= 0 
+      self.errors.add(:blanket_usage, "Pemakaian blanket harus lebih besar dari 0")
+      return self 
+    end
+
+    self.blanket_usage = params[:blanket_usage]
+
     
     non_negative_final_quantity_in_warehouse
     
     return self if self.errors.size !=  0 
     
-    stock_mutation = StockMutation.create_object( 
-      blanket_warehouse_item , # the item 
+    stock_mutation = StockMutation.create_bulk_usage_object( 
+      blanket.item , # the item 
+      blanket_usage, 
       self, # source_document_detail 
       STOCK_MUTATION_CASE[:deduction], # stock_mutation_case,
       STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
@@ -349,8 +393,9 @@ class BarringWorkOrderDetail < ActiveRecord::Base
     
     if barring.is_bar_included?
       
-      stock_mutation = StockMutation.create_object( 
-        left_bar_warehouse_item , # the item 
+      stock_mutation = StockMutation.create_bulk_usage_object( 
+        left_bar.item , # the item 
+        1,
         self, # source_document_detail 
         STOCK_MUTATION_CASE[:deduction], # stock_mutation_case,
         STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case
@@ -361,8 +406,9 @@ class BarringWorkOrderDetail < ActiveRecord::Base
       stock_mutation.warehouse_item.update_stock_mutation(stock_mutation)
       
       
-      stock_mutation = StockMutation.create_object( 
-        right_bar_warehouse_item , # the item 
+      stock_mutation = StockMutation.create_bulk_usage_object( 
+        right_bar.item , # the item 
+        1,
         self, # source_document_detail 
         STOCK_MUTATION_CASE[:deduction], # stock_mutation_case,
         STOCK_MUTATION_ITEM_CASE[:ready]  , # stock_mutation_item_case

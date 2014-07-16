@@ -13,6 +13,8 @@ class CreateBarringWorkOrderDetails < ActiveRecord::Migration
       t.datetime :rejected_at 
       t.string :reject_description 
       
+      t.integer :blanket_usage, :default => 0 
+      
       
 
       t.timestamps

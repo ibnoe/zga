@@ -130,7 +130,8 @@ ITEM_TYPE_CONSTANT = {
   :roller => 2 ,
   :compound => 3 ,
   :bar => 4 ,
-  :barring => 5 
+  :barring => 5 ,
+  :blanket => 6 
 }
 
 

@@ -79,5 +79,18 @@ class ItemType < ActiveRecord::Base
     new_object.legacy_code = ITEM_TYPE_CONSTANT[:barring]
     new_object.save
     
+    
+    new_object = self.new 
+    new_object.name = "Base blanket"
+    new_object.is_legacy = true 
+    new_object.legacy_code = ITEM_TYPE_CONSTANT[:blanket]
+    new_object.save
+    
   end
+  
+  def self.bar_item_type
+    self.where(:is_legacy => true, :legacy_code =>  ITEM_TYPE_CONSTANT[:barring]).first
+  end
+  
+  
 end

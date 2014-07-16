@@ -52,6 +52,8 @@ data_entry_role = Role.create!(
   
   admin = User.create_main_user(  :name => "Admin4", :email => "admin4@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
   admin.set_as_main_user
+  
+  ItemType.setup_item_type
 
   item_type = ItemType.create_object(
     :name => "Others",
@@ -319,3 +321,54 @@ Asset.all.each do |asset|
 end
 
 puts "Total maintenance #{Maintenance.count}"
+
+# create Core Builder 
+
+(1..3).each do |x|
+  base_core = "BSCR-"
+  CoreBuilder.create_object(
+    :used_core_sku => "#{base_core}#{x}U"   ,     
+    :new_core_sku  => "#{base_core}#{x}N"   ,
+    :base_core_sku => "#{base_core}#{x}"   ,
+    :description   => "Awesome #{base_core}#{x}"
+  )
+end
+
+
+puts "Total core builder: #{CoreBuilder.count}"
+puts "Total Core: #{Core.count}"
+
+(1..3).each do |x|
+  base_compound = "CMPND"
+  Compound.create_object(
+    :compound_sku => "#{base_compound}-#{x}"
+  )
+end
+
+
+(1..3).each do |x|
+  base = "BLNKT"
+  Blanket.create_object(
+    :blanket_sku => "#{base}-#{x}"
+  )
+end
+
+puts "Total Blanket: #{Blanket.count}"
+
+count = 1 
+CoreBuilder.all.each do |core_builder|
+  base_roller = "RBASE"
+  
+  RollerBuilder.create_object(
+    :roller_used_core_sku => "#{base_roller}#{count}-U"  ,     
+    :roller_new_core_sku  => "#{base_roller}#{count}-N"  ,
+    :base_roller_sku      => "#{base_roller}#{count}"    ,
+    :compound_id          => Compound.first.id       ,
+    :description          => "Awesome cb #{count}"   ,
+    :core_builder_id      => core_builder.id 
+
+  )
+  count += 1
+end
+
+puts "Total RollerBuilder: #{RollerBuilder.count}"

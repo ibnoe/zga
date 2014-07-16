@@ -39,19 +39,12 @@ class StockAdjustmentDetail < ActiveRecord::Base
     return if not stock_adjustment_id.present? 
     return if not item_id.present? 
     
-    selected_warehouse_item = WarehouseItem.where(
-      :item_id => item_id,
-      :warehouse_id => self.stock_adjustment.warehouse_id
-    ).first 
     
-    if selected_warehouse_item.nil?
-      return WarehouseItem.create_object(
-        :item_id => item_id,
-        :warehouse_id =>  self.stock_adjustment.warehouse_id
-      )
-    else
-      return selected_warehouse_item
-    end
+    WarehouseItem.find_or_create_object(
+    :item_id => item_id,
+    :warehouse_id => self.stock_adjustment.warehouse_id
+    )
+   
     
   end
   

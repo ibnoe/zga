@@ -84,20 +84,11 @@ class DeliveryOrderDetail < ActiveRecord::Base
   end
   
   def warehouse_item
-    selected_warehouse_item = WarehouseItem.where(
+    
+    WarehouseItem.find_or_create_object(
       :item_id => self.sales_order_detail.item_id,
       :warehouse_id => self.delivery_order.warehouse_id
-    ).first 
-    
-    if selected_warehouse_item.nil?
-      return WarehouseItem.create_object(
-        :item_id => self.sales_order_detail.item_id,
-        :warehouse_id =>  self.delivery_order.warehouse_id
-      )
-    else
-      return selected_warehouse_item
-    end
-    
+    ) 
   end
   
   

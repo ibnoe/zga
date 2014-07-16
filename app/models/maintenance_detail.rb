@@ -149,19 +149,12 @@ class MaintenanceDetail < ActiveRecord::Base
     return nil if not is_replacement_required.present? 
     return nil if  not is_replacement_required?
     
-    selected_warehouse_item = WarehouseItem.where(
-      :item_id => self.replacement_item_id ,
-      :warehouse_id => self.maintenance.warehouse_id
-    ).first 
+    WarehouseItem.find_or_create_object(
+    :item_id => self.replacement_item_id ,
+    :warehouse_id => self.maintenance.warehouse_id
+    )
     
-    if selected_warehouse_item.nil?
-      return WarehouseItem.create_object(
-        :item_id => self.replacement_item_id ,
-        :warehouse_id =>  self.maintenance.warehouse_id
-      )
-    else
-      return selected_warehouse_item
-    end
+  
     
   end
   

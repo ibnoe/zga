@@ -190,11 +190,14 @@ describe RollerWorkOrder do
   end
   
   it "should be allowed to finish rwo_detail" do
-    @rwo_detail.finish_object(
-      :finished_at => DateTime.now + 1.months 
+    @rwo_detail.reject_object(
+      :rejected_at => DateTime.now + 1.months 
     )
+     
     
-    @rwo_detail.is_finished.should be_true 
+    @rwo_detail.is_rejected.should be_true 
+    @ri_detail.reload
+    @ri_detail.is_job_scheduled.should be_false 
   end
   
   context "finishing rwo_detail" do
@@ -203,8 +206,8 @@ describe RollerWorkOrder do
       @initial_ready_source_whi_1 = @source_warehouse_item_1.ready
       @initial_ready_target_whi_1 = @target_warehouse_item_1.ready
       
-      @rwo_detail.finish_object(
-        :finished_at => DateTime.now + 1.months 
+      @rwo_detail.reject_object(
+        :rejected_at => DateTime.now + 1.months 
       )
       
       @source_warehouse_item_1.reload
@@ -212,46 +215,46 @@ describe RollerWorkOrder do
       @rwo_detail.reload 
     end
     
-    it "should not allow reject on finished roller work order detail" do
-      @rwo_detail.reject_object(
-        :rejected_at => DateTime.now + 10.days
+    it "should not allow finish on rejected roller work order detail" do
+      @rwo_detail.finish_object(
+        :finished_at => DateTime.now + 10.days
       )
       
       @rwo_detail.errors.size.should_not == 0 
     end
     
-    it "should create stock mutation: convert from the core to roller" do
-      @rwo_detail.is_finished.should be_true 
+    it "should not create stock mutation: convert from the core to roller" do
+      @rwo_detail.is_rejected.should be_true 
       @final_ready_source_whi_1 = @source_warehouse_item_1.ready
       diff_ready_source_whi_1 = @final_ready_source_whi_1 - @initial_ready_source_whi_1
-      diff_ready_source_whi_1.should == -1 
+      diff_ready_source_whi_1.should == 0 
       
       @final_ready_target_whi_1 = @target_warehouse_item_1.ready
       diff_ready_target_whi_1 = @final_ready_target_whi_1 - @initial_ready_target_whi_1
-      diff_ready_target_whi_1.should == 1 
+      diff_ready_target_whi_1.should == 0 
     end
     
     
-    context "cancel finish rwo detail" do
+    context "cancel reject rwo detail" do
       before(:each) do
         @initial_ready_source_whi_1 = @source_warehouse_item_1.ready
         @initial_ready_target_whi_1 = @target_warehouse_item_1.ready
         
-        @rwo_detail.unfinish_object
+        @rwo_detail.unreject_object
          
         @source_warehouse_item_1.reload
         @target_warehouse_item_1.reload
       end
       
       it "should cancel stock mutation" do
-        @rwo_detail.is_finished.should be_false 
+        @rwo_detail.is_rejected.should be_false 
         @final_ready_source_whi_1 = @source_warehouse_item_1.ready
         diff_ready_source_whi_1 = @final_ready_source_whi_1 - @initial_ready_source_whi_1
-        diff_ready_source_whi_1.should == 1 
-
+        diff_ready_source_whi_1.should == 0  
+    
         @final_ready_target_whi_1 = @target_warehouse_item_1.ready
         diff_ready_target_whi_1 = @final_ready_target_whi_1 - @initial_ready_target_whi_1
-        diff_ready_target_whi_1.should == -1 
+        diff_ready_target_whi_1.should == 0 
       end
     end
     

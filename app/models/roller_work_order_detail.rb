@@ -383,11 +383,7 @@ class RollerWorkOrderDetail < ActiveRecord::Base
       return self 
     end
     
-    if not params[:rejected_at].present?
-      self.errors.add(:rejected_at, "Harus ada tanggal reject")
-      return self
-    end
-    
+  
     
     
     

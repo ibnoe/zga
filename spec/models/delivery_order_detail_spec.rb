@@ -92,10 +92,10 @@ describe DeliveryOrderDetail do
 
     @stock_adjustment.confirm_object(:confirmed_at => DateTime.now - 2.days )
 
-    @warehouse_item = WarehouseItem.where(
+    @warehouse_item = WarehouseItem.find_or_create_object(
     :item_id => @item.id,
     :warehouse_id => @warehouse.id 
-    ).first 
+    ) 
     
     @do = DeliveryOrder.create_object(
       :delivery_date  => DateTime.new(2012,2,2,0,0,0),

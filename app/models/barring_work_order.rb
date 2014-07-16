@@ -3,7 +3,7 @@ class BarringWorkOrder < ActiveRecord::Base
   belongs_to :warehouse 
   
   
-  validates_presence_of :adjustment_date 
+  validates_presence_of :work_order_date 
   validates_presence_of :warehouse_id
   
   validate :valid_warehouse_id
